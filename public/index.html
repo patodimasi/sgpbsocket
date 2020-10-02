@@ -1,11 +1,75 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Chat Socket.io</title>
-    </head>
-    <body>
-       <i>hola como te va</i> 
+  <head>
+    <script src="./scripts/jquery-3.4.1.js"></script>
+    <script src="./scripts/bootstrap.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.css" />
+    <link rel= "shortcut icon" type= "image/ico" href="./images/logoico2.ico"/>
+    <link href="./css/signin.css" rel="stylesheet" type="text/css">
+    <title>SGPB - Inicio</title>
+  
+    <script>
+      $(document).ready(function(){
         
-    </body>
-</html>
+          $("#btnIngresar").click(function(){
+            
+              var user = $("#txtUser").val();
+              var pass = $("#txtPassword").val();
+              console.log("click");
+              $.ajax({
+                method : "GET",
+                async:true,
+                url:"../login?usr="+user.toUpperCase()+"&pass="+pass,
+                success: function(res){
+                  console.log(res);
+                  var jsoLogin = JSON.parse(res);
+                  
+                  if (jsoLogin.result.match("ERROR")){
+                      $("#err").show();
+                      $("#txtUser").val("");
+                      $("#txtPassword").val("");     
+                  }
+                  else
+                  {
+                     console.log(jsoLogin.logon);
+                     console.log(jsoLogin.foto);
+                     
+                      sessionStorage["iniciales"] = jsoLogin.iniciales;
+                      sessionStorage["nombre"] = jsoLogin.nombre;
+                      sessionStorage["logon"] = jsoLogin.logon;
+                      sessionStorage["codigo"] = jsoLogin.codigo;
+                      sessionStorage["foto"] = jsoLogin.foto;
+                      sessionStorage["label"] = jsoLogin.label;
+                      window.location = jsoLogin.url;
+                  }
+                }
+              });
+          });
+      });
+      
+      $(document).ready(function(){
+        $("#txtPassword").keydown(function(e){
+          if(e.which === 13){
+            $("#btnIngresar").click();
+          }
+        });  
+      });
+
+   </script>
+  </head>   
+
+  <body class="text-center">
+      <form class="form-signin">
+        <img src="./images/Logo_T2.png" alt="">   
+        <h1 class="h3 mb-3 font-weight-normal">Sistema de Gestion de planos Boherdi</h1>   
+        <input  id="txtUser" class="form-control" placeholder="Usuario" required autofocus>
+        <input  type="password" id="txtPassword" class="form-control" placeholder="Contraseña" required> 
+        <div class="checkbox mb-3">
+        </div>  
+        <button type="button" id ="btnIngresar" class="btn btn-lg btn-primary btn-block" role="button">Ingresar</button>
+        <div id="err" style="color:red; display: none;">Error de autenticacion</div>
+        <p class="mt-5 mb-3 text-muted">&copy; DB4-1412 Rev.1</p>
+      </form>  
+  </body>
+
+</html>   
