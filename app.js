@@ -3,11 +3,21 @@ var express = require('express');
 var app = express();
 var url = require('url');
 var mongoose = require('mongoose');
+var usuarios= require("./models/usuarios");
+mongoose.set('useFindAndModify', false);
 //settings
 app.set('port',3000);
 
 //static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+//mongo connect
+
+
+mongoose.connect('mongodb://localhost:27017/SGPB',{ useNewUrlParser: true,useUnifiedTopology: true },function(err,res){
+    if(err) throw err;
+    console.log('Base de datos conectada');
+});
 
 //start server
 app.listen(app.get('port'),()=>{
@@ -19,8 +29,7 @@ app.listen(app.get('port'),()=>{
 app.get('/login',(req,res)=>{
 
     var q = url.parse(req.url, true);
-    console.log(q);
-   /* usuarios.find({USR_LOGON: q.query.usr,USR_PASS: q.query.pass},function(err,docs){
+    usuarios.find({USR_LOGON: q.query.usr,USR_PASS: q.query.pass},function(err,docs){
      
       var loginResult = null;
 
@@ -57,5 +66,5 @@ app.get('/login',(req,res)=>{
         return res.end();
         
     });   
-    */
+    
 });
