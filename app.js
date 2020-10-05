@@ -4,6 +4,7 @@ var app = express();
 var url = require('url');
 var mongoose = require('mongoose');
 var usuarios= require("./models/usuarios");
+var planos = require("./models/planos");
 mongoose.set('useFindAndModify', false);
 //settings
 app.set('port',3000);
@@ -23,6 +24,71 @@ mongoose.connect('mongodb://localhost:27017/SGPB',{ useNewUrlParser: true,useUni
 app.listen(app.get('port'),()=>{
     console.log('server on port',app.get('port'));
 });
+
+//----------------------------------------------------Documentos------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------------Consulta de un solo documento------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+app.get('/buscar',(req,res)=>{
+    var buscar = mongoose.model(req.query.nombre_tabla_consulta);
+    var  filtro = {}
+    console.log(req.query.codigo);
+    if((req.query.codigo == '') && (req.query.nrorev == '') && (req.query.descripcion == ''))
+    {
+        res.write(JSON.stringify([]));
+        return res.end();  
+    }
+    else
+    {
+        if(req.query.codigo != '')
+        {
+            filtro.PLN_CODIGO = {'$regex': '.*' + req.query.codigo + '.*',$options : 'i'}       
+        }
+   
+        if(req.query.nrorev != '')
+        {
+            filtro.PLN_NRO_REV = parseInt(req.query.nrorev);
+        }
+   
+        if(req.query.descripcion != '')
+        {
+            filtro.PLN_DESCRIPCION = {'$regex': '.*' + req.query.descripcion + '.*',$options : 'i'}
+        } 
+ 
+        buscar.aggregate([
+            { $match: 
+            
+                filtro  
+             },
+            {$sort: {"PLN_NRO_REV":-1}},
+            {$group:{"_id": "$PLN_CODIGO",
+                    "PLN_CODIGO":{$first: "$PLN_CODIGO"},
+                    "PLN_NRO_REV" : {$first:"$PLN_NRO_REV"},
+                    "PLN_DESCRIPCION" :{$first:"$PLN_DESCRIPCION"},
+                    "PLN_ESTADO":{$first:"$PLN_ESTADO"},
+                    "PLN_USUARIO_ALTA":{$first:"$PLN_USUARIO_ALTA"},
+                    "PLN_FECHA":{$first:"$PLN_FECHA"},
+                    "PLN_FECHA_APR": {$first:"$PLN_FECHA_APR"},
+                    "PLN_USUARIO_APR": {$first:"$PLN_USUARIO_APR"},
+                    "PLN_FECHA_REC": {$first:"$PLN_FECHA_REC"},
+                    "PLN_USUARIO_REC": {$first:"$PLN_USUARIO_REC"},
+                    "PLN_COMENTARIO" : {$first:"$PLN_COMENTARIO"},
+                    "ID":{$first:"$_id"},
+                    
+            }}
+            ]
+            ,  function(err,docs) {
+                 res.write(JSON.stringify(docs));
+                 return res.end();
+              
+             }
+         );    
+          
+    }
+   
+});
+
 
 //-----------------------------------------------------Login usuarios--------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------------------
