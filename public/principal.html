@@ -4,16 +4,100 @@
         <meta charset="utf-8">
         <title>SGPB</title>
 
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+        
         <link rel="stylesheet" href="./css/main.css">
         <link rel="stylesheet" href="./css/sidebar-themes.css">
+        <link rel="shortcut icon"  href="./images/1.ico" />
+        
+        
     </head>
     
 <body id = "pantallap">
     <div class="page-wrapper default-theme sidebar-bg  toggled">
         <nav id="sidebar" class="sidebar-wrapper">
-            
+            <div class="sidebar-content">
+               
+                <div class="sidebar-item sidebar-brand">
+                    <a style="margin-left:9px;font-size:28px" href="#">SGPB</a>           
+                </div>
+               
+                <div class="sidebar-item sidebar-header d-flex flex-nowrap" style="margin-left:-10px">
+                    <form id="form1">
+                        <div class="alert">
+                            <div class="user-info">
+                               <strong><span id="usrnombre" style="text-align:left;font-size:17px" class="user-name"></strong>
+                               </span>    
+        
+                            </div>
+                       </div>
+                       <div id='img_contain'><img id="imagenf"></div> 
+                       <div class="input-group"> 
+                           <div class="custom-file">
+                               <input type="file" id="file" class="imgInp custom-file-input" aria-describedby="inputGroupFileAddon01">
+                               <label class="custom-file-label" for="file">Archivo</label>
+                           </div>
+                       </div>
+                    </form>
+                </div>
+              
+                <div class="sidebar-item sidebar-search">
+                    <div>
+                        <div class="input-group">
+                            <div class="input-group-append">
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class=" sidebar-item sidebar-menu">
+                    <ul>
+                        <li class="header-menu">
+                            <span>General</span>
+                        </li>
+                        <li class="sidebar-dropdown">
+                            <a href="#">
+                                <i class="fa fa-search"></i>
+                                <span class="menu-text">Consultas</span>    
+                            </a>
+                            <div  class="sidebar-submenu">
+                                <ul>
+                                    <li>
+                                        <a  data-menu-item="dconsultas" class="personal-menu-item dconsultas" href="#">Planos</a>         
+                                    </li>
+                                </ul>
+                            </div>    
+                        </li>
+                    </ul>    
+                </div>    
+            </div>    
         </nav>
+     
+
+        <!-- page-content  -->
+        <main  class="page-content pt-2">
+            <div class="container-fluid p-5 contents">
+                <div id="dconsultas">
+                   
+                </div>
+            </div>
+        </main>    
     </div>    
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
+    </script>
+    <script src="//malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="./scripts/main.js"></script>
+    
 </body>
 </html>
