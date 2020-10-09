@@ -1,4 +1,14 @@
 
+/*var permisos_usu = obtener_logon();
+var myDictionary = new Object();
+myDictionary["V"] = {"imagen": "./images/details_green.png", "aprobar": "disabled","rechazar": " "};
+myDictionary["A"] = {"imagen": "./images/details_yellow.png", "aprobar": " ","rechazar": "disabled"};
+myDictionary["R"] = {"imagen" : "./images/details_red.png", "aprobar": "disabled","rechazar": "disabled"};
+*/
+
+
+const socket = io()
+
 $(document).ready(function(){
  
     $("#dconsultas").html("<div class='row'>" +
@@ -81,7 +91,7 @@ $(document).ready(function(){
         
 
 });
-
+var tablep;
 //----------------------------------------Consulta de un solo plano-------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
 function Consulta_cp(codigo,nrorev,descripcion){
@@ -126,7 +136,7 @@ function Consulta_cp(codigo,nrorev,descripcion){
                         "data": null,
                         "className": "text-center",
                         'render': function (data, type, row) {
-                           // return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "' onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
+                            return "<button onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
 						   //return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "//" + "uno" + "'   onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
                         }
                     },
@@ -196,7 +206,7 @@ function Consulta_cp(codigo,nrorev,descripcion){
             });
                     
         }
-
+        
     }); 
          
  };
@@ -205,10 +215,9 @@ function Consulta_cp(codigo,nrorev,descripcion){
  //---------------------------------------------------------------------------------------------------------------------
  
 function Formatdetalle_cp(rowData){
-    
     var nombre_tabla_detalle = "planos";
     var div = $('<div/>')
-        .addClass( 'loading' )
+       .addClass( 'loading' )
         .text( 'Loading...' );
   
     var jsondetalle = {};
@@ -218,29 +227,12 @@ function Formatdetalle_cp(rowData){
             
             data: {
                 name: rowData.PLN_CODIGO,nombre_tabla_detalle
-            
             },
           
             success: function(res){
                 //aca tengo todas las versiones de los planos
                 var jsondetalle = JSON.parse(res);
-                function sortJSON(data, key, orden) {
-                    return data.sort(function (a, b) {
-                        var x = a[key],
-                        y = b[key];
-                
-                        if (orden === 'asc') {
-                            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                        }
-                
-                        if (orden === 'desc') {
-                            return ((x > y) ? -1 : ((x < y) ? 1 : 0));
-                        }
-                    });
-                }
-              
-                var oJSON = sortJSON(jsondetalle, 'PLN_NRO_REV', 'asc');
-            
+              //  console.log("es el jsondetalle" + "" + jsondetalle);
                 var tbody = '';
                 tbody += '<table id="tabledetalle" class="table">';
                 tbody += '<thead class="thead-dark">';
@@ -256,12 +248,12 @@ function Formatdetalle_cp(rowData){
                 tbody  += '</tr>';
                 tbody += '<thead>';
 
-                for (var i = 0; i < jsondetalle.length; i++) {
-                    var diccionario = Mostrar_detalle(jsondetalle[i].PLN_ESTADO,permisos_usu.aprobar,permisos_usu.rechazar);
-                 
-                    tbody += '<tr style=" text-align: center">';
-                    tbody += '<td>'+"<img id='"+jsondetalle[i]._id+"' src='"+diccionario.imagen+"' >"+'</td>';
-                 
+               for (var i = 0; i < jsondetalle.length; i++) {
+                    var myString = (Colorestado(jsondetalle[i].PLN_ESTADO));
+                
+                    tbody += '<tr id=row'+jsondetalle[i]._id+' style=" text-align: center">';
+                    tbody += '<td>'+"<img id='"+jsondetalle[i]._id+"' src='"+myString.imagen+"' >"+'</td>';
+                
                     tbody +=  '<td><span rel="tooltip" data-toggle="tooltipcom" data-placement="top" title="'+jsondetalle[i].PLN_COMENTARIO+'"  class="souligne">'+jsondetalle[i].PLN_NRO_REV+'</span></td>';
 
 
@@ -269,24 +261,18 @@ function Formatdetalle_cp(rowData){
                     tbody += '<td style=" text-align: center">'+jsondetalle[i].PLN_USUARIO_ALTA+'</td>';
                     tbody += '<td style=" text-align: center">'+'<label id="mybfa'+jsondetalle[i]._id+'"> '+jsondetalle[i].PLN_FECHA_APR+'</label>'+'</td>';
                     tbody += '<td style=" text-align: center">'+'<label id="mybua'+jsondetalle[i]._id+'"> '+jsondetalle[i].PLN_USUARIO_APR+'</label>'+'</td>';
-                 
-                    var boton =  Existe_ubicacion(jsondetalle[i].PLN_UBICACION);
-                    tbody += '<td>'+"<button id='mybtnubi"+"/"+jsondetalle[i]._id + "' ' "+boton+" ' style='margin-left: 17px;border-width: 1px' onclick='Abrirup(this)' class='Abrirup fa fa-folder-open data-toggle='tooltip' title='Ubicación'/>" + 
-                             "<button id='mybtnmodifubi"+"/"+jsondetalle[i]._id + "' onclick='Mostrarmodif(this)' "+permisos_usu.modifdes+" class='GetModifUbi fa fa-pencil-square' data-toggle='tooltip' title='Modificar Ubicación'></button>" +  '</td>';
-                             
-                 /*   tbody += '<td>'+"<button id='"+jsondetalle[i]._id +"/"+jsondetalle[i].PLN_CODIGO+ "'  ' " + myString.deshabilitar_e +" '  style='margin-left: 11px;border-width: 1px' onclick='Aprobar(this)' class='GetDetalle fa fa-thumbs-up' data-toggle='tooltip' title='Aprobar'/>"+
-                                  "<button id='"+jsondetalle[i]._id+ "' style='border-width: 1px' ' " + myString.deshabilitar_r +" ' onclick='Rechazar(this)' class='GetRechazar fa fa-times' data-toggle='tooltip' title='Rechazar'/>"+
-                             '</td>';
-                   */
-                    tbody += '<td>'+"<button id='"+jsondetalle[i]._id +"/"+jsondetalle[i].PLN_CODIGO+ "'  ' " + diccionario.aprobar +" '  style='margin-left: 11px;border-width: 1px' onclick='Aprobarp(this)' class='GetDetalle fa fa-thumbs-up' data-toggle='tooltip' title='Aprobar'/>"+
-                                "<button id='"+jsondetalle[i]._id+ "' style='border-width: 1px' ' " + diccionario.rechazar +" ' onclick='Rechazarp(this)' class='GetRechazar fa fa-times' data-toggle='tooltip' title='Rechazar'/>"+
-                            '</td>';
-                   
-                    tbody += '</tr>';
-                    
-
-                }
                 
+                    var boton =  Existe_ubicacion(jsondetalle[i].PLN_UBICACION);
+                    tbody += '<td>'+"<button style='outline:none' id='mybtnubi"+"/"+jsondetalle[i]._id + "' ' "+boton+" ' style='margin-left: 17px;border-width: 1px' onclick='Abrirup(this)' class='Abrirup fa fa-folder  data-toggle='tooltip' title='Ubicación'/>" + 
+                            "<button id='mybtnmodifubi"+"/"+jsondetalle[i]._id + "' onclick='Mostrarmodif(this)' class='GetModifUbi fa fa-pencil-square'  data-toggle='tooltip' title='Modificar Ubicación'></button>" +  '</td>';
+                    tbody += '<td>'+"<button style='outline:none' id='"+jsondetalle[i]._id +"/"+jsondetalle[i].PLN_CODIGO+ "'  ' " + myString.deshabilitar_e +" '  style='margin-left: 11px;border-width: 1px' onclick='Aprobar(this)' class='GetDetalle fa fa-thumbs-up' data-toggle='tooltip' title='Aprobar'/>"+
+                                "<button style='outline:none' id='"+jsondetalle[i]._id+ "' style='border-width: 1px' ' " + myString.deshabilitar_r +" ' onclick='Rechazar(this)' class='GetRechazar fa fa-times' data-toggle='tooltip' title='Rechazar'/>"+
+                            '</td>';
+                    tbody += '</tr>';
+                   
+                }
+            
+
                 tbody += '</table>';
                   
                 $('body').tooltip({
@@ -306,3 +292,130 @@ function Formatdetalle_cp(rowData){
      return   div;
        
 };
+
+//------------------------------------------------Colorea el estado (sacar proximamente)------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+
+function Colorestado(estado){
+    var resultado = new Object();
+    if(estado == 'V'){
+        resultado.imagen = "./images/details_green.png";
+        resultado.deshabilitar_e = '';
+        resultado.deshabilitar_r = '';
+    }
+    if(estado == 'A'){
+        resultado.imagen = "./images/details_yellow.png";
+        resultado.deshabilitar_e = ''  ;
+        resultado.deshabilitar_r = "disabled";
+    }
+    if(estado == 'R'){
+        resultado.imagen = "./images/details_red.png"
+        resultado.deshabilitar_e = "disabled";
+        resultado.deshabilitar_r = "disabled";
+    }
+    return resultado;
+}
+
+//----------------------------------------------Verifico si existe la ubicacion-------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+
+function Existe_ubicacion(idubicacion){
+    var boton = null;
+
+    if(idubicacion == ""){
+
+        boton =  'disabled';
+    }
+     else{
+       
+        boton =  "";
+    }
+ 
+     return boton;
+};
+
+//---------------------------------------Aprobar un plano---------------------------------------------
+//----------------------------------------------------------------------------------------------------
+
+function Aprobar(item){
+    infodp = $(item).attr("id");
+    console.log("infodp" + " " + infodp)
+    var logon = sessionStorage["logon"];
+    
+    id = (infodp.split('/')[0]);
+    codigo = (infodp.split('/')[1]);
+
+    nombre_tabla_aprobar = "planos";
+    
+    $.ajax({
+        method : "GET",
+        async:true,
+        url:"/aprobar",
+        dataType : 'json',
+        data:{codigo,id,logon,nombre_tabla_aprobar},
+     
+        success: function(res){ 
+           
+            if(res.msj_op == "NO_OK"){
+                alert(res.msj_ver);
+            }
+            else{
+                Actualizar_detalle_pa(res.msj_ver);
+                socket.emit('refrescar',res.resultadoa);
+                
+              
+            }
+         
+        }
+        
+    })
+        
+};
+//-----------------------------------------Refrescar-------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------
+socket.on('refrescar',function(data){
+    var boton =  Existe_ubicacion(data.PLN_UBICACION);
+    var myString = (Colorestado(data.PLN_ESTADO));
+    var newHtml ='<td>'+"<img  src='"+myString.imagen+"'>"+'</td>'
+            + '<td>' + data.PLN_NRO_REV + '</td>'
+            + '<td>' + data.PLN_FECHA + '</td>'
+            + '<td>' + data.PLN_USUARIO_ALTA + '</td>'
+            + '<td>' + data.PLN_FECHA_APR+ '</td>'
+            + '<td>' + data.PLN_USUARIO_APR+ '</td>'
+            + '<td>'+"<button style='outline:none' id='mybtnubi"+"/"+data._id + "' ' "+boton+" ' style='margin-left: 17px;border-width: 1px' onclick='Abrirup(this)' class='Abrirup fa fa-folder data-toggle='tooltip' title='Ubicación'/>" + 
+              "<button style='outline:none' id='mybtnmodifubi"+"/"+data._id + "' onclick='Mostrarmodif(this)' class='GetModifUbi fa fa-pencil-square' data-toggle='tooltip' title='Modificar Ubicación'></button>" +  '</td>'
+            + '<td>'+"<button style='outline:none' id='"+data._id +"/"+data.PLN_CODIGO+ "'  ' " + myString.deshabilitar_e +" '  style='margin-left: 11px;border-width: 1px' onclick='Aprobar(this)' class='GetDetalle fa fa-thumbs-up' data-toggle='tooltip' title='Aprobar'/>"+
+              "<button style='outline:none' id='"+data._id+ "' style='border-width: 1px' ' " + myString.deshabilitar_r +" ' onclick='Rechazar(this)' class='GetRechazar fa fa-times' data-toggle='tooltip' title='Rechazar'/>";
+
+            $("#row"+ data._id).html(newHtml);
+})
+
+//-------------------------------Actualizar el detalle de un plano------------------------------------------
+//-----------------------------------------------------------------------------------------------------------
+
+function Actualizar_detalle_pa(jsondetalle){
+
+    for(var i = 0;i < jsondetalle.length;i++){
+        var myString = (Colorestado(jsondetalle[i].PLN_ESTADO));
+        if(jsondetalle[i].PLN_ESTADO == "R"){
+            //cambio de color el led a rojo
+            $("#"+ jsondetalle[i]._id ).attr('src', myString.imagen);
+            //desabilito el boton de aprobacion
+            $("[id='"+jsondetalle[i]._id +"/"+jsondetalle[i].PLN_CODIGO+ "']").attr("disabled",true);
+            //desabilito el boton de rechazado
+            $("[id='"+jsondetalle[i]._id+"']").attr("disabled",true);
+        }
+        if(jsondetalle[i].PLN_ESTADO == "V"){
+            //agrego a la celda el nombre del usuario aprobacion
+            $('#mybua'+ jsondetalle[i]._id ).text(jsondetalle[i].PLN_USUARIO_APR);
+            //agrego la fecha de aprobacion
+            $('#mybfa'+ jsondetalle[i]._id ).text(jsondetalle[i].PLN_FECHA_APR);
+            //cambio led a verde
+            $("#"+ jsondetalle[i]._id ).attr('src', myString.imagen);
+
+            $("[id='"+jsondetalle[i]._id +"/"+jsondetalle[i].PLN_CODIGO+ "']").attr("disabled",true);
+            $("[id='"+jsondetalle[i]._id+"']").attr("disabled",false);
+        }
+    }
+   
+}
