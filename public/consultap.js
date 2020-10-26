@@ -1,105 +1,14 @@
-
-/*var permisos_usu = obtener_logon();
-var myDictionary = new Object();
-myDictionary["V"] = {"imagen": "./images/details_green.png", "aprobar": "disabled","rechazar": " "};
-myDictionary["A"] = {"imagen": "./images/details_yellow.png", "aprobar": " ","rechazar": "disabled"};
-myDictionary["R"] = {"imagen" : "./images/details_red.png", "aprobar": "disabled","rechazar": "disabled"};
-*/
-
-
 const socket = io()
-
-$(document).ready(function(){
- 
-    $("#dconsultas").html("<div class='row'>" +
-            "<div class='form-group col-md-12'>" +
-                "<h2>Planos</h2>" +
-            "</div>"+
-        "</div>"+
-        "<div class='row'>"+
-        "</div>" +
-        "<hr>" +
-        
-       "<form class='form'>" +
-            "<div class='row'>"+
-                "<div class='col-md-8'>"+
-                    "<div class='row'>"+
-                        "<div class='col-md-6'>"+
-                            "<label for='codigo'><strong>Código</strong></label>"+
-                            "<input  style='text-transform: uppercase' type='text' class='form-control' id='codigo_cp' placeholder='' value='' required></input>"+
-                        "</div>"+
-                        "<div class='col-md-6'>"+
-                            "<label  for='nrorev'><strong>NroRev</strong></label>"+
-                            "<input  type='number' class='form-control' id='nrorev_cp' placeholder='' value='' required></input>"+
-                        "</div>"+
-                    "</div>"+
-                    "<div class='row'>"+
-                        "<div class='col-md-12'>"+
-                            "<label for='descripcion'><strong> Descripción</strong></label>"+
-                            "<input type='text' class='form-control' id='descripcion_cp' placeholder='' value='' required>"+
-                        "</div>"+
-                    "</div>"+
-                "</div>"+
-                "<div class='col-md-4'>"+
-                    "<img style='margin-top:-170px' src='./images/logocolores3.png'>"+
-                    "<div class='card' style='width: 18rem;margin-top: -10px'>"+
-                        "<div class='card-header'>"+
-                            "<strong>Estados</strong>"+ 
-                        "</div>"+
-                        "<ul class='list-group list-group-flush'>"+
-                            "<li class='list-group-item'> <img src='./images/details_green.png'>"+
-                                " Vigente" +
-                            "</li>"+
-                            "<li class='list-group-item'><img src='./images/details_yellow.png'>"+
-                                " Pendiente de aprobación"+
-                                
-                            "</li>"+
-                            "<li class='list-group-item'><img src='./images/details_red.png'>"+
-                                " No vigente"+
-                            "</li>"+
-                        "</ul>"+
-                    "</div>"+
-                "</div>"+
-            "</div>"+
-        "</form>" +
-        "<div>"+
-             //"<button  type='button' "+permisos_usu.alta+" id=mybtnAlta onclick='Btnalta()' class='btn btn-info btn-circle btn-xl' data-toggle='tooltip'  title='Alta Plano'><i class='fa fa-plus'></i>"+
-        "</div>"+
-        "<div style='margin-top:20px'>"+
-            "<button id=bpb type='button' onclick='Consulta_cp(codigo_cp,nrorev_cp,descripcion_cp)' class='btn btn-primary btn-sm'>Buscar</button>"+
-            "<button id=bpt type='button' onclick='Consulta_cpt()'style='margin-left:5px' class='btn btn-secondary btn-sm'>Todos</button>"+    
-        "</div>"+
-        "<div style='margin-left: -15px;margin-top: 40px' class='container'>"+
-            "<table id='example_cp' class='display'>" +
-                "<thead>" +
-                    "<tr>"+
-                    
-                        "<th style='width: 5px'></th>"+
-                        "<th style='width: 70px'></th>"+
-                        "<th style='width: 350px'></th>"+
-                        "<th style='width: 70px'></th>"+  
-                    "</tr>"+
-                "</thead>" +
-                "<tbody>"+
-
-                "</tbody>"+
-            "</table>"+
-        "</div>"   
-        
+//-----------------------------------------------------------------Consulta un solo documento-------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+function Consulta(){
+    var codigo = $("#codigo").val();
+    var descripcion = $("#descripcion").val();
+    var nrorev = $("#nrorev").val();
+    var nombre = $("#bpb").val();
     
-    );
-        
-
-});
-var tablep;
-//----------------------------------------Consulta de un solo plano-------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------
-function Consulta_cp(codigo,nrorev,descripcion){
-   
-    var codigo = codigo_cp.value;
-    var descripcion = descripcion_cp.value;
-    var nrorev = nrorev_cp.value;
-    var nombre_tabla_consulta = "planos";
+    console.log("esta es la info del item" + " " + nombre);
+    var nombre_tabla_consulta = nombre;
 
     $.ajax({
         method : "GET",
@@ -107,17 +16,15 @@ function Consulta_cp(codigo,nrorev,descripcion){
         url:"/buscar",
         dataType : 'json',
         data: {codigo,descripcion,nrorev,nombre_tabla_consulta},
+
         success: function(respuesta){
-          
-            $('#example_cp').dataTable().fnDestroy();
-           
-            tablep =  $('#example_cp').DataTable({     
+            $('#example').dataTable().fnDestroy();
+
+            table =  $('#example').DataTable({  
                 data: respuesta,
-              
                 language:{"url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"},
                 "lengthMenu": [[20, 30, 50, 100, -1], [ 20, 30, 50, 100, "Todos"]],
-                
-                
+
                 "columns": [
                     {
                     
@@ -125,32 +32,28 @@ function Consulta_cp(codigo,nrorev,descripcion){
                         "orderable":      false,
                         "data":           null,
                         "defaultContent": ""
-                  
-                   
                     } ,
                     
-                    { title: "Código","className": "text-center","data": "PLN_CODIGO"},
+                    { "data": "PLN_CODIGO"},
                   
-                    { title: "Descripción","className": "text-left","data": "PLN_DESCRIPCION"},
-                    { title: "Nueva Revisión", 
+                    { "data": "PLN_DESCRIPCION"},
+                    { 
                         "data": null,
                         "className": "text-center",
                         'render': function (data, type, row) {
                             return "<button onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
-						   //return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "//" + "uno" + "'   onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
+                           //return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "//" + "uno" + "'   onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
                         }
                     },
                   
                             
                 ],
-                   
+
                 "order": [[1, 'asc']] ,
 
-               
-            }); 
-           
-            //modificar la descripcion
-            tablep.MakeCellsEditable({
+            });
+
+            table.MakeCellsEditable({
                 "onUpdate": myCallbackFunction,
                 "inputCss":'my-input-class',
                 "columns": [2],
@@ -183,11 +86,11 @@ function Consulta_cp(codigo,nrorev,descripcion){
             
             //abrir y cerrar el icono de detalle
            
-            $('#example_cp tbody').off('click', 'td.details-control');
-            $('#example_cp tbody').on('click', 'td.details-control', function () {
+            $('#example tbody').off('click', 'td.details-control');
+            $('#example tbody').on('click', 'td.details-control', function () {
                                 
                 var tr = $(this).closest('tr');
-                var row = tablep.row(tr);
+                var row = table.row(tr);
                 
                 if (row.child.isShown()) {
                     
@@ -197,25 +100,26 @@ function Consulta_cp(codigo,nrorev,descripcion){
                 }
                 else {
                   
-                    row.child( Formatdetalle_cp(row.data())).show();  
+                    row.child( Formatdetalle(row.data())).show();  
                
                     tr.addClass('shown');
                     
                 }     
 
             });
-                    
-        }
-        
-    }); 
-         
- };
 
- //-------------------------------------------Detalle de cada plano-----------------------------------------------------
- //---------------------------------------------------------------------------------------------------------------------
+        }
+
+    });
+    
+};
+
+//-------------------------------------------Detalle de cada documento--------------------------------------------------------------
+ //--------------------------------------------------------------------------------------------------------------------------------
  
-function Formatdetalle_cp(rowData){
-    var nombre_tabla_detalle = "planos";
+ function Formatdetalle(rowData){
+    var nombre = $("#bpb").val();
+    var nombre_tabla_detalle = nombre;
     var div = $('<div/>')
        .addClass( 'loading' )
         .text( 'Loading...' );
@@ -293,7 +197,7 @@ function Formatdetalle_cp(rowData){
        
 };
 
-//------------------------------------------------Colorea el estado (sacar proximamente)------------------------------------------
+//------------------------------------------------Colorea el estado del documento-------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
 
 function Colorestado(estado){
@@ -334,8 +238,8 @@ function Existe_ubicacion(idubicacion){
      return boton;
 };
 
-//---------------------------------------Aprobar un plano---------------------------------------------
-//----------------------------------------------------------------------------------------------------
+//---------------------------------------Aprobar un documento---------------------------------------------
+//--------------------------------------------------------------------------------------------------------
 
 function Aprobar(item){
     infodp = $(item).attr("id");
@@ -345,7 +249,8 @@ function Aprobar(item){
     id = (infodp.split('/')[0]);
     codigo = (infodp.split('/')[1]);
 
-    nombre_tabla_aprobar = "planos";
+    var nombre = $("#bpb").val();
+    nombre_tabla_aprobar = nombre;
     
     $.ajax({
         method : "GET",
@@ -360,9 +265,10 @@ function Aprobar(item){
                 alert(res.msj_ver);
             }
             else{
-                Actualizar_detalle_pa(res.msj_ver);
-                socket.emit('refrescar',res.resultadoa);
-                
+              //  Actualizar_detalle(res.msj_ver);
+                //console.log("mensaje ver" + " " + res.msj_ver);
+                //socket.emit('refrescar',res.resultadoa);
+                socket.emit('refrescar',res.msj_ver);
               
             }
          
@@ -371,29 +277,33 @@ function Aprobar(item){
     })
         
 };
-//-----------------------------------------Refrescar-------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------
-socket.on('refrescar',function(data){
-    var boton =  Existe_ubicacion(data.PLN_UBICACION);
-    var myString = (Colorestado(data.PLN_ESTADO));
-    var newHtml ='<td>'+"<img  src='"+myString.imagen+"'>"+'</td>'
-            + '<td>' + data.PLN_NRO_REV + '</td>'
-            + '<td>' + data.PLN_FECHA + '</td>'
-            + '<td>' + data.PLN_USUARIO_ALTA + '</td>'
-            + '<td>' + data.PLN_FECHA_APR+ '</td>'
-            + '<td>' + data.PLN_USUARIO_APR+ '</td>'
-            + '<td>'+"<button style='outline:none' id='mybtnubi"+"/"+data._id + "' ' "+boton+" ' style='margin-left: 17px;border-width: 1px' onclick='Abrirup(this)' class='Abrirup fa fa-folder data-toggle='tooltip' title='Ubicación'/>" + 
-              "<button style='outline:none' id='mybtnmodifubi"+"/"+data._id + "' onclick='Mostrarmodif(this)' class='GetModifUbi fa fa-pencil-square' data-toggle='tooltip' title='Modificar Ubicación'></button>" +  '</td>'
-            + '<td>'+"<button style='outline:none' id='"+data._id +"/"+data.PLN_CODIGO+ "'  ' " + myString.deshabilitar_e +" '  style='margin-left: 11px;border-width: 1px' onclick='Aprobar(this)' class='GetDetalle fa fa-thumbs-up' data-toggle='tooltip' title='Aprobar'/>"+
-              "<button style='outline:none' id='"+data._id+ "' style='border-width: 1px' ' " + myString.deshabilitar_r +" ' onclick='Rechazar(this)' class='GetRechazar fa fa-times' data-toggle='tooltip' title='Rechazar'/>";
 
-            $("#row"+ data._id).html(newHtml);
+//-----------------------------------------Refrescar aprobacion a todos los clientes-------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------
+socket.on('refrescar',function(data){
+    for(var i = 0;i < data.length;i++){
+        var myString = (Colorestado(data[i].PLN_ESTADO));
+            var boton =  Existe_ubicacion(data[i].PLN_UBICACION);
+            var newHtml ='<td>'+"<img  src='"+myString.imagen+"'>"+'</td>'
+                + '<td>' + data[i].PLN_NRO_REV + '</td>'
+                + '<td>' + data[i].PLN_FECHA + '</td>'
+                + '<td>' + data[i].PLN_USUARIO_ALTA + '</td>'
+                + '<td>' + data[i].PLN_FECHA_APR+ '</td>'
+                + '<td>' + data[i].PLN_USUARIO_APR+ '</td>'
+                + '<td>'+"<button style='outline:none' id='mybtnubi"+"/"+data[i]._id + "' ' "+boton+" ' style='margin-left: 17px;border-width: 1px' onclick='Abrirup(this)' class='Abrirup fa fa-folder data-toggle='tooltip' title='Ubicación'/>" + 
+                    "<button style='outline:none' id='mybtnmodifubi"+"/"+data[i]._id + "' onclick='Mostrarmodif(this)' class='GetModifUbi fa fa-pencil-square' data-toggle='tooltip' title='Modificar Ubicación'></button>" +  '</td>'
+                + '<td>'+"<button style='outline:none' id='"+data[i]._id +"/"+data[i].PLN_CODIGO+ "'  ' " + myString.deshabilitar_e +" '  style='margin-left: 11px;border-width: 1px' onclick='Aprobar(this)' class='GetDetalle fa fa-thumbs-up' data-toggle='tooltip' title='Aprobar'/>"+
+                    "<button style='outline:none' id='"+data[i]._id+ "' style='border-width: 1px' ' " + myString.deshabilitar_r +" ' onclick='Rechazar(this)' class='GetRechazar fa fa-times' data-toggle='tooltip' title='Rechazar'/>";
+    
+                $("#row"+ data[i]._id).html(newHtml);
+    }
+                
 })
 
-//-------------------------------Actualizar el detalle de un plano------------------------------------------
-//-----------------------------------------------------------------------------------------------------------
+//-------------------------------Actualizar el detalle de un documento------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
 
-function Actualizar_detalle_pa(jsondetalle){
+function Actualizar_detalle(jsondetalle){
 
     for(var i = 0;i < jsondetalle.length;i++){
         var myString = (Colorestado(jsondetalle[i].PLN_ESTADO));
@@ -418,4 +328,7 @@ function Actualizar_detalle_pa(jsondetalle){
         }
     }
    
-}
+};
+
+
+
