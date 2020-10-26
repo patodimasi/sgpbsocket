@@ -37,7 +37,11 @@ $(document).ready(function(){
 
 // manejo de la sidebar
 $(document).ready(function() {
-    $('div#dconsultas').show();
+   /* $('.sidebar div').click(function(e) {
+        $('#content').text($(this).text())
+    })
+    */
+   /* $('div#dconsultas').show();
     $('body').on('click','a.personal-menu-item', function(e) {
         e.preventDefault();
     
@@ -46,7 +50,9 @@ $(document).ready(function() {
     $('.contents > div').not($selected).hide();
   
    });
-   
+   */
+  $('#dconsultas').hide();
+    $('#content').show();
 })
 
 function obtener_logon(){

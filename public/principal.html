@@ -17,7 +17,9 @@
         <link rel="stylesheet" href="./css/sidebar-themes.css">
         <link rel="shortcut icon"  href="./images/1.ico" />
         
-        
+        <script src="documento.js"></script>
+        <!--script src="plano.js"></script>
+        <script src="materiales.js"></script-->
     </head>
     <style>
     td.details-control {
@@ -26,6 +28,17 @@
       }
       tr.shown td.details-control {
         background: url('./images/detailsblue-cerrar.png') no-repeat center center;
+      }
+      .contents > div {
+        display: none;
+      }
+      .btn-circle.btn-xl {
+        width: 70px;
+        height: 70px;
+        padding: 10px 16px;
+        border-radius: 35px;
+        font-size: 24px;
+        line-height: 1.33;
       }
     </style>
     
@@ -79,28 +92,141 @@
                             </a>
                             <div  class="sidebar-submenu">
                                 <ul>
+                                   
                                     <li>
-                                        <a  data-menu-item="dconsultas" class="personal-menu-item dconsultas" href="#">Planos</a>         
+                                        <a  data-menu-item="dconsultas" onclick="Info_doc(plano.nombre_tabla,plano.nombre)" class="personal-menu-item dconsultas" href="#">Planos
+                                            <script type="text/javascript">
+                                               var plano = new Plano("Planos","planos");
+                                               console.log(plano.nombre_tabla);
+                                               console.log(plano.nombre);
+                                            </script>
+                                        </a>         
+                                    </li>
+                                    <li>
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(material.nombre_tabla,material.nombre)" class="personal-menu-item dconsultasm" href="#">Lista de Materiales</a>
+                                        <script type="text/javascript">
+                                            var material = new Material("Lista de Materiales","materiales");
+                                        </script>    
+                                    </li>
+                                    <li>
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(manual.nombre_tabla,manual.nombre)" class="personal-menu-item dconsultasm" href="#">Manuales</a>
+                                        <script type="text/javascript">
+                                           var manual = new Manual("Manuales","manuales");
+
+                                        </script>    
                                     </li>
                                 </ul>
+                                
                             </div>    
                         </li>
                     </ul>    
                 </div>    
             </div>    
         </nav>
-     
-
         <!-- page-content  -->
         <main  class="page-content pt-2">
             <div class="container-fluid p-5 contents">
                 <div id="dconsultas">
-                   
+                    <script type="text/javascript">
+                        function Info_doc(nombre_tabla,titulo){    
+                            $('#dconsultas').show();
+                            $('#content').hide(); 
+                            $('#codigo').val("");
+                            $('#nrorev').val("");
+                            $('#descripcion').val("");       
+                            $('#example').dataTable().fnDestroy();
+                            $("#example > tbody").html("");
+                            console.log("este es el nombre del doc" + " " + titulo);
+                            console.log("este es el nombre de la tabla" + " " + nombre_tabla);
+                            $('#titulo').text(titulo);
+                            $('#bpb').val(nombre_tabla);
+                            
+                        }    
+                    </script>
+                    <div class='row'>
+                        <div class='form-group col-md-12'>
+                            <h2 id="titulo"></h2>
+                        </div>
+                    </div>
+                    <div class='row'>
+                    </div>
+                    <hr>
+                    <form class='form'>
+                        <div class='row'>
+                            <div class='col-md-8'>
+                                <div class='row'>
+                                    <div class='col-md-6'>
+                                        <label for='codigo'><strong>Código</strong></label>
+                                        <input  style='text-transform: uppercase' type='text' class='form-control' id='codigo' placeholder='' value='' required></input>
+                                    </div>
+                                    <div class='col-md-6'>
+                                        <label  for='nrorev'><strong>NroRev</strong></label>
+                                        <input  type='number' class='form-control' id='nrorev' placeholder='' value='' required></input>
+                                    </div>
+
+                                </div>
+                                <div class='row'>
+                                    <div class='col-md-12'>
+                                        <label for='descripcion'><strong> Descripción</strong></label>
+                                        <input type='text' class='form-control' id='descripcion' placeholder='' value='' required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='col-md-4'>
+                                <img style='margin-top:-170px' src='./images/logocolores3.png'>
+                                <div class='card' style='width: 18rem;margin-top: -10px'>
+                                    <div class='card-header'>
+                                        <strong>Estados</strong>
+                                    </div>
+                                    <ul class='list-group list-group-flush'>
+                                        <li class='list-group-item'> <img src='./images/details_green.png'>
+                                            Vigente
+                                        </li>   
+                                        <li class='list-group-item'><img src='./images/details_yellow.png'>
+                                            Pendiente de aprobación
+                                        </li>   
+                                        <li class='list-group-item'><img src='./images/details_red.png'>
+                                            No vigente
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div>
+                        <button  type='button' id=mybtnAlta onclick='Btnalta()' class='btn btn-info btn-circle btn-xl' data-toggle='tooltip'  title='Alta'><i class='fa fa-plus'></i>
+                    </div>
+                    <div style='margin-top:20px'>
+                        
+                        <button id=bpb type='button'  onclick='Consulta()' class='btn btn-primary btn-sm'>Buscar</button>
+                        <button id=bpt type='button' onclick='Consulta_t()'style='margin-left:5px' class='btn btn-secondary btn-sm'>Todos</button>    
+                    </div>
+                    <div id="tableexample" style='margin-left: -15px;margin-top: 40px' class='container'>
+                        <table id='example' class='display'>
+                            <thead>
+                                <tr>
+                                    <th style='width: 5px'></th>
+                                    <th style='width: 70px'></th>
+                                    <th style='width: 350px'></th>
+                                    <th style='width: 70px'></th>  
+                                </tr>
+                            </thead>
+                            <tbody>
+            
+                            </tbody>
+                        </table>
+                    </div>   
                 </div>
+                    <div id="content">
+                        Default stuffggggg
+                    </div>
             </div>
         </main>    
     </div>    
 
+    <!-- Crearia el html para todos los documentos  -->
+     
+    <!-- fin  -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
         integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
@@ -113,6 +239,7 @@
     <script src="./scripts/main.js"></script>
     <script src="/socket.io/socket.io.js" charset="utf-8"></script>
     <script src="consultap.js"></script>
+    <!--script src="documento.js"></script-->
     <script src="principal.js"></script>
     <script type="text/javascript" languaje="javascript" src="./scripts/jquery.dataTables.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css"> 
