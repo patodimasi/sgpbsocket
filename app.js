@@ -5,6 +5,9 @@ var url = require('url');
 var mongoose = require('mongoose');
 var usuarios= require("./models/usuarios");
 var planos = require("./models/planos");
+var manuales = require("./models/manuales");
+var materiales = require("./models/materiales");
+
 mongoose.set('useFindAndModify', false);
 //settings
 app.set('port',3000);
@@ -162,14 +165,11 @@ app.get('/aprobar',(req,res)=>{
                     {
                         msj_op : "OK",
                         msj_ver : msj_apro,
-                        resultadoa : result,
                     }
                         
                 }
-                console.log(Result_op.resultadoa);
                 res.write(JSON.stringify(Result_op)); 
                 return res.end();
-
             })
              
         }
