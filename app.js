@@ -179,6 +179,39 @@ app.get('/aprobar',(req,res)=>{
     
 });
 
+//----------------------------------------------------------Busca todos los documentos---------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------
+app.get('/buscarTodos',(req,res)=>{
+    var buscarTodos = mongoose.model(req.query.nombre_tabla_consultat);
+    
+    buscarTodos.aggregate([
+        {$sort: {"PLN_NRO_REV":-1}},
+        {$group:{"_id": "$PLN_CODIGO",
+            "PLN_CODIGO":{$first: "$PLN_CODIGO"},
+            "PLN_NRO_REV" : {$first:"$PLN_NRO_REV"},
+            "PLN_DESCRIPCION" :{$first:"$PLN_DESCRIPCION"},
+            "PLN_ESTADO":{$first:"$PLN_ESTADO"},
+            "PLN_USUARIO_ALTA":{$first:"$PLN_USUARIO_ALTA"},
+            "PLN_FECHA":{$first:"$PLN_FECHA"},
+            "PLN_FECHA_APR": {$first:"$PLN_FECHA_APR"},
+            "PLN_USUARIO_APR": {$first:"$PLN_USUARIO_APR"},
+            "PLN_FECHA_REC": {$first:"$PLN_FECHA_REC"},
+            "PLN_USUARIO_REC": {$first:"$PLN_USUARIO_REC"},
+            "PLN_COMENTARIO": {$first:"$PLN_COMENTARIO"},
+            "ID":{$first:"$_id"},
+            
+        }}
+    ]
+        ,function(err,docs) {
+            if(err) throw err;
+            res.write(JSON.stringify(docs));
+            return res.end();
+      
+        }
+    );    
+      
+});
+
 //----------------------------------------------------Usuarios------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
 
