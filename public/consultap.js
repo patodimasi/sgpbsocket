@@ -204,7 +204,7 @@ function Colorestado(estado){
     var resultado = new Object();
     if(estado == 'V'){
         resultado.imagen = "./images/details_green.png";
-        resultado.deshabilitar_e = '';
+        resultado.deshabilitar_e = "disabled";
         resultado.deshabilitar_r = '';
     }
     if(estado == 'A'){
@@ -251,6 +251,7 @@ function Aprobar(item){
 
     var nombre = $("#bpb").val();
     nombre_tabla_aprobar = nombre;
+    console.log("este es el nombre de la tabla" + " " + nombre_tabla_aprobar);
     
     $.ajax({
         method : "GET",
@@ -329,6 +330,116 @@ function Actualizar_detalle(jsondetalle){
     }
    
 };
+//---------------------------------------------Consultar todos los documentos------------------------------------------
+//------------------------------------------------------------------------------------------------------
+
+function Consulta_t(){
+    $('#example').dataTable().fnDestroy();
+    var nombre = $("#bpb").val();
+    var nombre_tabla_consultat = nombre;
+     
+    var table = $('#example').DataTable({
+       
+        language:{"url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"},
+        "lengthMenu": [[20, 30, 50, 100, -1], [ 20, 30, 50, 100, "Todos"]],
+        
+        "ajax":{
+            "url": "/buscarTodos",
+            "data": {nombre_tabla_consultat},
+            "dataSrc":""
+        },
+      
+        "columns": [
+            {
+            
+                "class":          "details-control",
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ""
+          
+           
+            } ,
+            
+            { "data": "PLN_CODIGO" },
+          
+            { "data": "PLN_DESCRIPCION"},
+            { 
+                "data": null,
+                "className": "text-center",
+                'render': function (data, type, row) {
+                  
+                  //  return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "' onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
+                  // return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "//" + "todos" + "' onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
+                  return "<button onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
+                }
+            },
+          
+                    
+        ],
+
+        "order": [[1, 'asc']],
+      
+        
+    });   
+    table.MakeCellsEditable({
+        "onUpdate": myCallbackFunction,
+        "inputCss":'my-input-class',
+        "columns": [2],
+        "confirmationButton": { // could also be true
+            "confirmCss": 'my-confirm-class',
+            "cancelCss": 'my-cancel-class'
+        },
+        "inputTypes": []
+    }); 
+
+   function myCallbackFunction (updatedCell, updatedRow, oldValue) {
+            console.log("The new value for the cell is: " + updatedCell.data());
+            console.log("The old value for that cell was: " + oldValue);
+            console.log("The values for each cell in that row are: " + JSON.stringify(updatedRow.data()));
+            var codigo = (updatedRow.data().PLN_CODIGO);
+            var descripcion = (updatedRow.data().PLN_DESCRIPCION);
+            var nombre_tabla_descripcion = "planos";
+
+            $.ajax({
+                method : "GET",
+                async: true,
+                url:"/Modif",
+                dataType : 'json',
+                data : {codigo,descripcion,nombre_tabla_descripcion},
+               
+
+            })      
+            
+    }    
+      
+        $('#example tbody').off('click', 'td.details-control');
+        $('#example tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+              
+            if (row.child.isShown()) {
+                //fila que esta abierta y la cierro
+                // console.log("fila que esta abierta y la cierro")
+               
+                row.child.hide();
+                tr.removeClass('shown');
+                
+            }
+            else {
+                //abrir fila
+              
+                row.child( Formatdetalle(row.data())).show();
+             
+                
+                tr.addClass('shown');
+                
+            } 
+            
+            
+        });
+
+} ;
+
 
 
 
