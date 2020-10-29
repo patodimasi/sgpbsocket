@@ -7,6 +7,7 @@ var usuarios= require("./models/usuarios");
 var planos = require("./models/planos");
 var manuales = require("./models/manuales");
 var materiales = require("./models/materiales");
+var multer = require("multer");
 
 mongoose.set('useFindAndModify', false);
 //settings
@@ -16,8 +17,6 @@ app.set('port',3000);
 app.use(express.static(path.join(__dirname, 'public')));
 
 //mongo connect
-
-
 mongoose.connect('mongodb://localhost:27017/SGPB',{ useNewUrlParser: true,useUnifiedTopology: true },function(err,res){
     if(err) throw err;
     console.log('Base de datos conectada');
@@ -29,7 +28,6 @@ const server = app.listen(app.get('port'),()=>{
 });
 
 //socket
-
 const SocketIO = require('socket.io');
 const io = SocketIO(server);
 
@@ -39,6 +37,30 @@ io.on('connection',(socket) => {
         io.sockets.emit('refrescar',data)
     });    
 });
+
+//----------------------------------------------------Variables relacionadas con las fotos de los usuarios---------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+
+    var storage = multer.diskStorage({
+        destination: function (req, file, cb){
+          cb(null, './public/uploadas')
+        },
+        filename: function (req, file, cb){
+          cb(null, file.originalname)
+        }
+      });
+    
+    var upload = multer({
+        storage: storage,
+        
+        fileFilter: function (req, file, cb) {
+            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+                return cb(null, false, new Error("Only images are allowed"))
+            }
+            cb(null, true);
+          }
+    });
+
 //----------------------------------------------------Documentos------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
 
@@ -181,6 +203,7 @@ app.get('/aprobar',(req,res)=>{
 
 //----------------------------------------------------------Busca todos los documentos---------------------------------------
 //---------------------------------------------------------------------------------------------------------------------------
+
 app.get('/buscarTodos',(req,res)=>{
     var buscarTodos = mongoose.model(req.query.nombre_tabla_consultat);
     
@@ -210,6 +233,64 @@ app.get('/buscarTodos',(req,res)=>{
         }
     );    
       
+});
+
+//----------------------------------------------------Rechazar documentos------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+
+app.get('/rechazar',(req,res)=>{
+    
+    var rechazar = mongoose.model(req.query.nombre_tabla_rech);
+    console.log(req.query.nombre_tabla);
+    msj_rech = []
+    msj_result = "";
+    var Result_op = null;
+    rechazar.findOneAndUpdate({_id:req.query.inforp}, {$set:{PLN_ESTADO:"R"}},{new:true}, function(err, item) {
+       //  if (err) throw err;
+       console.log(item)
+        if(err)
+            Result_op =
+            {
+                msj_op : "NO_OK",
+                msj_ver : "Error al realizar el update en la base de datos,no se pudo rechazar el documento"
+            }
+        
+        else{
+            Result_op =
+                {
+                    msj_op : "OK",
+                    msj_ver : item
+                }               
+            
+        }
+         
+        console.log(Result_op);   
+        res.write(JSON.stringify(Result_op)); 
+        return res.end(); 
+    })
+    
+});
+
+//----------------------------------------------------Nueva revision del documento---------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+app.get('/confirmar_nuevarev',(req,res)=>{
+    msjnrev = null;
+    var nueva_rev = mongoose.model(req.query.nombre_tabla_nuevarev);
+    console.log(req.query);
+    nueva_rev.create(req.query, function(err, resultadonrv) {
+        if (err){
+           
+            msjrev = "NO_OK"; 
+        }
+        else{
+            msjrev = "OK";
+            
+        }
+            res.write(JSON.stringify(msjrev)); 
+            return res.end(); 
+    })
+    
+    
 });
 
 //----------------------------------------------------Usuarios------------------------------------------------------------------
@@ -273,3 +354,48 @@ app.get('/mostrar_usu',(req,res)=>{
     });
     
 });
+
+//--------------------------------------------Imagen usuario-------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
+
+app.post('/upload', upload.single('file'), function (req, res, next) {
+
+    try{
+        console.log(req.file);
+      
+        console.log(req.url);
+        
+        var nomnre = ((req.url).split("?"))[1];
+        console.log(nomnre);
+    
+        var url = '/uploadas/' + req.file.filename;
+        console.log("-----------------CAMBIO DE FOTO---------------");
+        console.log("logon usuario" + " " +  global.logonusu);
+        var group = (req.file.filename.split(".")[0]);
+        console.log("Este es el archivo " + " " + req.file.filename);
+        sharp(req.file.path)
+        
+    
+        .toFile('public/uploadas/' + group + "-resize.jpg", function (err) {
+               
+            if (err) console.log(err);
+             
+            usuarios.updateOne({USR_LOGON: nomnre},{$set:{USR_FOTO: '/uploadas/' + group + '-resize.jpg',USR_LABEL:req.file.filename}}, function(err, result) {
+                    console.log(result);
+                    res.json({
+                        code : 1,
+                        data :'/uploadas/' + group + "-resize.jpg"
+                    });
+                    res.end();
+    
+                });
+        });
+        } catch (ex) {
+            res.json({
+                code : 2,
+                data :'/uploadas/' + group + "-resize.jpg"
+            });
+            res.end();
+      }
+});
+    
