@@ -1,14 +1,3 @@
-class Permiso_usu {
-    constructor(alta, rechazar, nuevarev, aprobar,modifdes,usuario) {
-        this.alta = alta;
-        this.rechazar = rechazar;
-        this.nuevarev = nuevarev;
-        this.aprobar = aprobar;
-        this.modifdes = modifdes;
-    }
-}
-
-
 //login usuario
 $(document).ready(function(){
     if (sessionStorage["nombre"]){
@@ -41,18 +30,20 @@ $(document).ready(function() {
         $('#content').text($(this).text())
     })
     */
-   /* $('div#dconsultas').show();
+ /*   $('div#dconsultas').show();
     $('body').on('click','a.personal-menu-item', function(e) {
         e.preventDefault();
     
     var selectedItem = $(this).attr('data-menu-item'); 
+    
     var $selected = $('#' + selectedItem).show();
     $('.contents > div').not($selected).hide();
   
    });
    */
-  $('#dconsultas').hide();
+    $('#dconsultas').hide();
     $('#content').show();
+    
 })
 
 function obtener_logon(){
