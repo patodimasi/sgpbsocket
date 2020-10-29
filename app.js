@@ -8,6 +8,29 @@ var planos = require("./models/planos");
 var manuales = require("./models/manuales");
 var materiales = require("./models/materiales");
 var multer = require("multer");
+  
+
+var sharp = require('sharp');
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb){
+      cb(null, './public/uploadas')
+    },
+    filename: function (req, file, cb){
+      cb(null, file.originalname)
+    }
+});
+
+var upload = multer({
+    storage: storage,
+    
+    fileFilter: function (req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+            return cb(null, false, new Error("Only images are allowed"))
+        }
+        cb(null, true);
+      }
+});
 
 mongoose.set('useFindAndModify', false);
 //settings
@@ -37,29 +60,6 @@ io.on('connection',(socket) => {
         io.sockets.emit('refrescar',data)
     });    
 });
-
-//----------------------------------------------------Variables relacionadas con las fotos de los usuarios---------------------------
-//-----------------------------------------------------------------------------------------------------------------------------------
-
-    var storage = multer.diskStorage({
-        destination: function (req, file, cb){
-          cb(null, './public/uploadas')
-        },
-        filename: function (req, file, cb){
-          cb(null, file.originalname)
-        }
-      });
-    
-    var upload = multer({
-        storage: storage,
-        
-        fileFilter: function (req, file, cb) {
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-                return cb(null, false, new Error("Only images are allowed"))
-            }
-            cb(null, true);
-          }
-    });
 
 //----------------------------------------------------Documentos------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -372,7 +372,7 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
         console.log("-----------------CAMBIO DE FOTO---------------");
         console.log("logon usuario" + " " +  global.logonusu);
         var group = (req.file.filename.split(".")[0]);
-        console.log("Este es el archivo " + " " + req.file.filename);
+        console.log("Este es el archivo " + " " + req.file.filename)
         sharp(req.file.path)
         
     
@@ -381,7 +381,9 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
             if (err) console.log(err);
              
             usuarios.updateOne({USR_LOGON: nomnre},{$set:{USR_FOTO: '/uploadas/' + group + '-resize.jpg',USR_LABEL:req.file.filename}}, function(err, result) {
+                console.log("1");
                     console.log(result);
+                console.log("2");    
                     res.json({
                         code : 1,
                         data :'/uploadas/' + group + "-resize.jpg"
