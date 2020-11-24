@@ -7,9 +7,15 @@ var usuarios= require("./models/usuarios");
 var planos = require("./models/planos");
 var manuales = require("./models/manuales");
 var materiales = require("./models/materiales");
-var multer = require("multer");
-  
+var instructivodeensayos = require("./models/instructivodeensayos");
+var instructivodeproducciones = require("./models/instructivodeproducciones");
+var subinstructivodeproducciones = require("./models/subinstructivodeproducciones");
+var productos = require("./models/productos");
+const fs = require('fs');
+var _ = require('lodash');
+var program = require('commander');
 
+var multer = require("multer");
 var sharp = require('sharp');
 
 var storage = multer.diskStorage({
@@ -293,6 +299,321 @@ app.get('/confirmar_nuevarev',(req,res)=>{
     
 });
 
+
+//---------------------------------------------------visualiza el maximo de un plano a dar de alta--------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/maxp',(req,res)=>{
+    var nummax = null;
+
+    var max = planos.find().sort({'PLN_CODIGO': -1}).limit(1)
+    
+    max.exec(function(err, maxResult){
+        if(err) throw err;
+        
+        else{
+          console.log("El maximo del documento a dar de alta es:" + " " + maxResult[0].PLN_CODIGO);
+          nummax = ((maxResult[0].PLN_CODIGO.split('-')[1]));
+          console.log(nummax + 1);
+          nummax = parseInt((maxResult[0].PLN_CODIGO.split('-')[1])) + 1 ;
+           
+          
+          res.write(JSON.stringify("DB4-" + nummax));
+          return res.end();
+            
+        }
+       
+    });
+    
+  
+});
+//--------------------------------------------------------------visualiza el maximo de un instructivo de ensayo---------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/altaie', function(req, res){
+    //console.log(req.query.nombreensayo);
+    var  filtro = {}
+
+    switch(req.query.nombreensayo) {
+        case "Ensayo Recepción":
+          text = "IB10-01";
+          break;
+        case "Ensayo Producción":
+          text = "IB10-02";
+          break;
+        case "Ensayo Final":
+          text = "IB10-03";
+          break;
+        default:
+          text = null
+    }
+     
+
+    filtro.PLN_CODIGO = {'$regex' : '.*' +  text };
+
+   instructivodeensayos.aggregate([
+        { $match: 
+            filtro
+        },
+        {$sort: {"PLN_CODIGO": -1}},
+    
+        ]
+        ,  function(err,docs) {
+            var group = parseInt((docs[0].PLN_CODIGO.split("-")[1])) + 1;
+            res.write(JSON.stringify("IB10-0" + group));
+            return res.end();
+        }
+    );     
+    
+});
+//--------------------------------------------------------------visualiza el maximo de un manual,plano, instructivo prod y subinstrucito----------
+//------------------------------------------------------------------------------------------------------------------------------------------------
+
+app.get('/maxdoc',(req,res)=>{
+    var nummax = null;
+    var text = null;
+    //console.log(req.query.nombre_tabla_maximo);
+    switch(req.query.nombre_tabla_maximo) {
+        case "planos":
+          text = "DB4-";
+          break;
+        case "manuales":
+          text = "EB4-0";
+          break;
+        case "instructivodeproducciones":
+            text = "IB9-0";
+            break;
+        case "subinstructivodeproducciones":
+            text = "SB9-0";
+            break;
+        default:
+          text = null
+    }
+    var maxdoc = mongoose.model(req.query.nombre_tabla_maximo);
+
+    var max = maxdoc.find().sort({'PLN_CODIGO': -1}).limit(1);
+
+    max.exec(function(err, maxResult){
+        if(err) throw err;
+
+        else{
+          
+            nummax = parseInt((maxResult[0].PLN_CODIGO.split('-')[1])) + 1
+
+            res.write(JSON.stringify(text + nummax));
+            return res.end();
+        }
+    });
+   
+});
+
+//-----------------------------------------------------Trae todos los productos para dar de alta una lista de materiales---------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/traerprod',(req,res)=>{
+    
+    productos.find(function(err, productos){
+        if(err) throw err;
+      //  console.log("Estos son los productos" + " " + productos);
+        res.write(JSON.stringify(productos));
+        return res.end();
+        
+   });
+});
+
+//------------------------------------------------------ Muestra el maximo de cada producto de una lista de materiales-------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/buscarmaxlm',(req,res)=>{
+    var codigoinicio = null;
+    productos.find({PLN_NOMBRE:req.query.nombre}, function(err, lista) {
+          
+        if(err) throw err;
+  
+        var codigo = {'$regex': '.*' + lista[0].PLN_INICIO + '.*'}
+        codigoinicio = lista[0].PLN_INICIO;
+         // deberia fijarme que exista el producto 
+         
+        materiales.find({PLN_CODIGO: codigo}).sort( [['PLN_CODIGO', 'desc']]).exec(function(err, collectionItems) {
+            if(err) throw err;
+            if(collectionItems == ""){
+                    // var codigofinal = codigoinicio + "/" + 1 ;
+                    var codigofinal = codigoinicio  + "/00" + 1; 
+                    console.log("es la primera lm del producto" + " " +  codigoinicio + "/" + 1 );
+            }
+                
+            else
+            {
+                    
+                var codigoaux = (collectionItems[0].PLN_CODIGO.split("/")[1]);
+                var codigoauxsum = (parseInt(codigoaux) + 1);
+                    
+                inputData = String(codigoauxsum); // Cast to string
+    
+                if(inputData.length == 1){
+    
+                    var codigofinal = (collectionItems[0].PLN_CODIGO.split("/")[0]) + "/00" + (parseInt(codigoaux) + 1);
+                }
+    
+                else if(inputData.length == 2) {
+                    var codigofinal = (collectionItems[0].PLN_CODIGO.split("/")[0]) + "/0" + (parseInt(codigoaux) + 1);
+                } 
+                      
+            }    
+
+            res.write(JSON.stringify(codigofinal)); 
+            return res.end();  
+                  
+        })
+          
+    });
+
+});   
+  
+
+//----------------------------------------------------Confirma el alta de un documento-----------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------
+
+app.get('/alta',(req,res)=>{
+    
+    var f = new Date();
+    fecha = f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear();
+    var alta = mongoose.model(req.query.nombre_tabla_alta);
+       
+    var myobj = 
+        { PLN_FECHA: fecha,PLN_CODIGO:req.query.codigo,PLN_DESCRIPCION:req.query.descripcion,PLN_UBICACION:req.query.ubicacion, PLN_NRO_REV:0,PLN_ESTADO:"A",
+         PLN_USUARIO_ALTA:req.query.logon,PLN_USUARIO_APR: "",PLN_FECHA_APR:""};
+     
+    alta.create(myobj, function(err, resultadop) {
+        if (err){
+          
+           var msjerror = "NO_OK"
+        }
+        else{
+        
+            var msjerror = "OK"
+            console.log("1 document inserted");
+            res.write(JSON.stringify(msjerror));
+            return res.end();
+        }    
+    });    
+});
+
+//----------------------------------------------------Ubicacion de un documento------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+app.get('/getUbicaciondoc', function(req, res){
+    var ubicacion = mongoose.model(req.query.nombre_tabla_ubicacion);    
+    ubicacion.find({_id:req.query.id_ubi}, function(err, plano) {
+        if(err) throw err;
+
+        fs.exists(plano[0].PLN_UBICACION,function(exists){
+            console.log(plano[0].PLN_UBICACION);
+            if(exists){
+                var ubiResult =
+                {
+                    resultado : "OK",
+                    url :    "/altapAux.html",
+                    ubicacion : plano[0].PLN_UBICACION       
+                }
+                
+            }else{
+                 var ubiResult =
+                {
+                    resultado : "NOOK"
+             
+                }
+            }
+           
+            res.write(JSON.stringify(ubiResult)); 
+            return res.end(); 
+        });
+       
+    });
+});
+
+app.get('/files', function(req, res) {
+
+    let dir = req.query.ubi;
+   // console.log("la primera dir" + "" + dir)
+    currentDir =  dir;
+    var query = req.query.path || '';
+   // console.log("el query" + "" + query);
+    if (query) currentDir = path.join(dir, query);
+   // console.log("browsing ", currentDir);
+    fs.readdir(currentDir, function (err, files) {
+        if (err) {
+           throw err;
+         }
+         var data = [];
+         files
+         .filter(function (file) {
+             return true;
+         }).forEach(function (file) {
+           try {
+                   //console.log("processing ", file);
+                   var stats = fs.statSync(path.join(currentDir,file));
+                   var time = stats["atime"];
+                   var date = time.toString().substr(4,11);
+   
+                   var isDirectory = fs.statSync(path.join(currentDir,file)).isDirectory();
+                   if (isDirectory) {
+                     data.push({ Name : file,Date : date, IsDirectory: true, Path : path.join(query, file)  });
+                   } else {
+                     var ext = path.extname(file);
+                     if(program.exclude && _.contains(program.exclude, ext)) {
+                       console.log("excluding file ", file);
+                       return;
+                     }       
+                     data.push({ Name : file,Date:date, Ext : ext, IsDirectory: false, Path : path.join(query, file) });
+                   }
+   
+           } catch(e) {
+             console.log(e); 
+           }        
+   
+         });
+         data = _.sortBy(data, function(f) { return f.Name});
+         res.json(data);
+    });
+    
+});
+   
+app.get('/Documento', function(req, res) {
+    let file;
+    var direccionfinal = req.headers.referer.split("ubi=")[1];
+    file = direccionfinal + "\\" + (req.query.f);
+    console.log("segunda direccion " + file);
+    res.sendFile(decodeURIComponent(req.query.f));
+});
+
+app.get('/Ubi', function(req, res) {
+    let file;
+    var direccionfinal = decodeURIComponent(req.headers.referer.split("ubi=")[1]);
+    
+    console.log("esta es la direccion final" + " " +direccionfinal);
+    console.log("esta es la req.query "  + (req.query.f) );
+
+    file = direccionfinal + "\\" + (req.query.f);
+  
+    console.log("este es el file " +file);
+
+    var archivo = (req.query.f.split("\\"));
+  
+    var archivo2 = archivo[archivo.length -1];
+
+    res.send(
+        "<html>"+
+            "<head>"+
+                "<title>" + archivo2 + "</title>"+
+                "<style type='text/css'>"+
+                "html, body, div, iframe { margin:0; padding:0; height:100%; }"+
+                "iframe { display:block; width:100%; border:none; }"+
+                "</style>"+
+            "</head>"+
+            "<body>"+
+            "<iframe width='100%' length='100%' src='/Documento?f=" + encodeURIComponent(file) + "'>"+
+            "</body>"+
+        "</html>"
+      );
+})
+
+
 //----------------------------------------------------Usuarios------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
 
@@ -313,6 +634,7 @@ app.get('/login',(req,res)=>{
             {
                 result : "SUCCESS",
                 url : "/principal.html",
+               //url : "/prueba.html",
                 iniciales : docs[0].USR_INICIAL, 
                 nombre : docs[0].USR_NOMBRE + " " + docs[0].USR_APELLIDO,
                 codigo : docs[0].USR_CODIGO,
