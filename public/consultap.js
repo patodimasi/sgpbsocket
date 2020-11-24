@@ -252,7 +252,7 @@ function Aprobar(item){
 
     var nombre = $("#bpb").val();
     nombre_tabla_aprobar = nombre;
-    console.log("este es el nombre de la tabla" + " " + nombre_tabla_aprobar);
+   // console.log("este es el nombre de la tabla" + " " + nombre_tabla_aprobar);
     
     $.ajax({
         method : "GET",
@@ -306,8 +306,45 @@ socket.on('refrescar',function(data){
                 
 })
 
+//---------------------------------------------Abrir la ubicacion de un documento--------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+function Abrirup(item){
+    infoubi = $(item).attr("id");
+    id_ubi = infoubi.split("/")[1];
+
+    var nombre = $("#bpb").val();
+    nombre_tabla_ubicacion = nombre;
+
+    $.ajax({
+        method : "GET",
+        async: true,
+        url:"/getUbicaciondoc",
+        dataType : 'json',
+        data: {id_ubi,nombre_tabla_ubicacion},
+            
+        success: function(respuesta){
+         
+           if(respuesta.resultado == "OK"){
+               
+                var varUrl = respuesta.url + '?ubi=' + respuesta.ubicacion;
+               
+                console.log("Es la varURL" + " " + varUrl);
+                
+                window.open(varUrl,'_blank');
+           }
+           else{ 
+              
+               alert("La ubicación del documento no existe");
+              
+           }
+           
+           
+        }
+
+    })
+};
 //---------------------------------------------Consultar todos los documentos------------------------------------------
-//------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 
 function Consulta_t(){
     $('#example').dataTable().fnDestroy();
@@ -419,7 +456,7 @@ function Consulta_t(){
 //--------------------------------------------- Rechazar undocumento ---------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------------------
 function Rechazar(item){
-    console.log("llega el rechazar");  
+   // console.log("llega el rechazar");  
     //En esta funcion lo que ago es cambiar el estado de verde a rojo y bloquear el boton
     inforp = $(item).attr("id");
 
@@ -496,7 +533,7 @@ function NuevaRev(item){
     $("#comentarios_nr").val(" ");
 
     $("#nuevarev_new_nr").val((infodp.PLN_NRO_REV) + 1);
-    console.log("esta es la nueva rev" + " " + $("#nuevarev_new_nr").val());
+    //console.log("esta es la nueva rev" + " " + $("#nuevarev_new_nr").val());
     $("#fechaalta_new_nr").val(fecha);
     $("#descripcion_new_nr").val(infodp.PLN_DESCRIPCION);
     
@@ -533,18 +570,8 @@ function Confirmarnr(){
         success: function(res){ 
             console.log(res);
             if (res == "OK"){
-                console.log("llega");
+               // console.log("llega");
                 alert("La nueva revisión del documento" + " " + PLN_CODIGO + " " + "se realizó correctamente");
-
-               /* if(tipo_consulta == "uno"){
-                     Consulta(codigo,nrorev,descripcion);
-                }
-                else if(tipo_consulta == "todos"){
-               
-                    var tab = $('#example').DataTable();
-                    tab.ajax.reload(null, true);
-                }
-                */
             }   
             else{
                 alert("Error al realizar el update en la base de datos,no se pudo realizar la nueva revisión del documento")
@@ -556,9 +583,351 @@ function Confirmarnr(){
   
     $('#myModal_nr').modal('hide');  
 
+};
+//-------------------------------------------------Muestra el formulario a dar de alta una lista de materiales-------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+function materialesalta(){
+    $('#MymodalAltam').modal();
+    // trae los productos al combo box
+    $.ajax({
+     
+        method : "GET",
+        async: true,
+        url:"/traerprod",
+        dataType : 'json',
+
+        success: function (data) {
+           llenarcombo(data); 
+        },
+      
+        
+    });
+};
+
+//--------------------------------Busca el maximo de cada producto en una lista de materiales---------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------
+$("#buscarlm").click(function(){
+
+    $("#codigomat" ).attr("disabled",false);
+    $("#desclmat" ).attr("disabled",false);
+    $("#ubilmat" ).attr("disabled",false);
+
+    var nombre = $('.Input').val();
+
+    $.ajax({
+     
+        method : "GET",
+        async: true,
+        url:"/buscarmaxlm",
+        dataType : 'json',
+        data: {nombre},
+        success: function (data) {
+         
+          $("#codigomat" ).val(data);
+
+        },
+      
+        
+    });
+  
+});
+//------------------------------------------------limpiar el evento onchange del combobox--------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+$(".Input").change(function(){
+    $('#codigomat').val("");
+    $('#codigomat').attr("disabled",true);
+    $("#desclmat" ).attr("disabled",true);
+    $("#ubilmat" ).attr("disabled",true);
+    
+});
+
+//------------------------------------------------Llena el combo box de la lista de materiales de dar de alta--------------------
+//-------------------------------------------------------------------------------------------------------------------------------
+
+function llenarcombo(lista)
+{
+   
+    for(var i = 0; i< lista.length;i++){ 
+        $('.Input').append('<option>' + lista[i].PLN_NOMBRE  + '</option');
+
+    }
+   
 }
 
+//----------------------------------------Muestra el formulario a dar de alta de un plano,manual------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------
+function docalta(nombre_tabla_maximo){
+    $("#maxcodigo").val("");
+    $("#descdoc").val("");
+    $("#ubidoc").val("");
+
+    $('#MymodalAlta').modal();
+
+    $.ajax({
+        method : "GET",
+        async:true,
+        url:"/maxdoc",
+        dataType : 'json',
+        data: {nombre_tabla_maximo},
+        success: function(res){
+        //obtengo en la respuesta el maximo y lo muestro en el formulario  
+        $("#maxcodigo").val(res).prop('disabled', true);;
+    
+        }
+
+     });
+
+}
+
+//------------------------------------Alta de un plano, manual--------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+$("#altadoc").click(function(){
+     var codigo =  $("#maxcodigo").val();
+      var ubicacion = $("#ubidoc").val().trim();
+      var descripcion = $("#descdoc").val();
+      var logon = sessionStorage["logon"];
+
+      var nombre = $("#bpb").val();
+      var nombre_tabla_alta = nombre;  
+  
+      if(validar_ubicacion(ubicacion) == false){
+          alert("La ubicacion del plano tiene que comenzar con //BOHERDISERVER")
+          $("#ubiplano").val(" ");
+      }
+      else{
+  
+      //envio al servidor los datos del formulario
+          $.ajax({
+              method : "GET",
+              async:true,
+              url:"/alta",
+              dataType : 'json',
+              data:{codigo, ubicacion,descripcion,logon,nombre_tabla_alta},
+              success: function(res){
+              
+              //si la respuesta en correcta oculto el formulario
+                  if(res == "OK"){
+                  
+                      $('#MymodalAlta').modal('hide');
+                     alert("El alta del documento" + " " + codigo + " " + "se dio de alta satisfactoriamente"); 
+                  
+                  }
+                  else{
+                      alert("Error al crear el documento" + " " + codigo);
+                  }
+          
+              }
+  
+          });
+      }
+});
+
+//---------------------------Valida la ubicacion al dar de alta de un documento------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+function validar_ubicacion(ubicacion){
+    var ubicacion_sb_valida = (ubicacion.substr(0,15)).toUpperCase();
+     console.log("substr y mayuscula" + " " + ubicacion_sb_valida);
+     var resultado = null;
+ 
+     if((ubicacion_sb_valida == "\\\\BOHERDISERVER")){
+        resultado = true;
+     }
+     else{
+         console.log("ubicacion no valida")
+         resultado = false;
+     }    
+     return resultado;
+ };
 
 
+// -------------------------- Analiza cual es el documento  a dar de alta -----------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
 
+function Btnalta(){
 
+    var nombre = $("#bpb").val();
+
+    if((nombre == "planos") || (nombre == "manuales") || (nombre == "instructivodeproducciones") 
+        || (nombre == "subinstructivodeproducciones")){
+        docalta(nombre);
+    } 
+   
+    if (nombre == "materiales"){
+        materialesalta(nombre);
+    }
+
+    if(nombre == "instructivodeensayos"){
+        instructivosalta(nombre);
+    }
+   
+};
+
+//----------------------------------------------Muestra el maximo de un instructivo de ensayo--------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------
+function instructivosalta(nombre){
+    $('#MymodalAltaie').modal();
+    // lleno el comboboox
+    $('.Inputie').empty();
+    $('.Inputie').append('<option>' + "Ensayo Recepción"  + '</option');
+    $('.Inputie').append('<option>' + "Ensayo Producción"  + '</option');
+    $('.Inputie').append('<option>' + "Ensayo Final"  + '</option');
+
+    var nombreensayo = "Ensayo Recepción"
+    //traigo el IB10-01 por defecto
+    $.ajax({
+        method : "GET",
+        async:true,
+        url:"/altaie",
+        dataType : 'json',
+        data:{nombreensayo},
+
+        success: function(res){
+        //obtengo en la respuesta el maximo y lo muestro en el formulario  
+            console.log("resultado" +  " " + res);
+            $("#codie").val(res);
+            
+        }
+
+    });
+};
+
+//---------------------------------------------------Realiza el alta  de un instructivo de ensayo en la base de datos-----------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+$("#altaie").click(function(){
+    var codigo =  $('#codie').val();
+    var descripcion =  $('#descie').val();
+    var ubicacion =  $('#ubiie').val().trim();
+    var logon = sessionStorage["logon"];
+    var nombre_tabla_alta = "instructivodeensayos";
+    
+    if(validar_ubicacion(ubicacion) == false){
+        alert("La ubicacion del documento tiene que comenzar con \r//BOHERDISERVER")
+        $('#ubiie').val("");
+    }
+    else{
+
+        $.ajax({
+        
+            method : "GET",
+            async: true,
+            url:"/alta",
+            dataType : 'json',
+            data: {codigo,descripcion,ubicacion,logon,nombre_tabla_alta},
+            success: function (data) {
+                if(data == "NO_OK"){
+                    alert("Error al crear un nuevo instructivo de ensayo");
+                } 
+                else{
+                    $('#MymodalAltaie').modal('hide'); 
+                    alert("El documento" + " " + codigo + " " +  "se dio de alta satisfactoriamente");
+                    $("#descie").val("");
+                    $("#ubiie").val("");
+
+                }
+            
+            },
+        
+            
+        });
+    }
+
+});
+//----------------------------------------------------Cierra el form del alta del instructivo y limpia--------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+$("#cerrarie").click(function(){
+    $('.Inputie').empty();
+    $('#codie').val("");
+    $('#descie').val("");
+    $('#ubiie').val("");
+});
+
+//---------------------------------------------------Evento on change del combo donde carga el maximo de cada instructivo de ensayo----------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+$(".Inputie").change(function(){
+    
+    var nombreensayo = $('select[name="comboensayo"] option:selected').text()
+  
+    $.ajax({
+        method : "GET",
+        async:true,
+        url:"/altaie",
+        dataType : 'json',
+        data:{nombreensayo},
+
+        success: function(res){
+        //obtengo en la respuesta el maximo y lo muestro en el formulario  
+            console.log("resultado" +  " " + res);
+            $("#codie").val(res);
+            $("#descie").val("");
+            $("#ubiie").val("");
+            
+        }
+
+    });
+
+});
+
+//-----------------------------------------------Valida la ubicacion de un documento antes de dar de alta-----------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
+function validar_ubicacion(ubicacion){
+    var ubicacion_sb_valida = (ubicacion.substr(0,15)).toUpperCase();
+     console.log("substr y mayuscula" + " " + ubicacion_sb_valida);
+     var resultado = null;
+ 
+     if((ubicacion_sb_valida == "\\\\BOHERDISERVER")){
+        resultado = true;
+     }
+     else{
+         console.log("ubicacion no valida")
+         resultado = false;
+     }    
+     return resultado;
+ };
+ 
+//-------------------------------------------------------Confirmar alta de un documento-----------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------Alta de una lista de materiales en la base de datos------------------------------------
+$("#altalmat").click(function(){
+    var codigo =  $('#codigomat').val();
+    var descripcion =  $('#desclmat').val();
+    var ubicacion =  $('#ubilmat').val().trim();
+    var logon = sessionStorage["logon"];
+    var nombre_tabla_alta = "materiales"  
+
+    if(validar_ubicacion(ubicacion) == false){
+        alert("La ubicación del documento tiene que comenzar con \r//BOHERDISERVER");
+        $('#ubilmat').val("");
+    }
+    else{
+
+        $.ajax({
+        
+            method : "GET",
+            async: true,
+            url:"/alta",
+            dataType : 'json',
+            data: {codigo,descripcion,ubicacion,logon,nombre_tabla_alta},
+            success: function (data) {
+                if(data == "NO_OK"){
+                    alert("Error al crear el documento");
+                } 
+                else{
+                    $('#MymodalAltam').modal('hide');
+                    
+                    alert("El documento" + " " + codigo + " " + "se dio de alta satisfactoriamente");
+                    
+                    $('#codigomat').val("");
+                    $('#desclmat').val("");
+                    $('#ubilmat').val("");
+
+                    $("#codigomat" ).attr("disabled",true);
+                    $("#desclmat" ).attr("disabled",true);
+                    $("#ubilmat" ).attr("disabled",true);
+
+                }
+            },
+        
+            
+        });
+    }
+});

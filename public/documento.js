@@ -23,3 +23,20 @@ function Manual(nombre,nombre_tabla){
 
 Manual.prototype = new Documento();
 
+function InstructivoEnsayo(nombre,nombre_tabla){
+    Documento.call(this,nombre,nombre_tabla);
+}
+
+InstructivoEnsayo.prototype = new Documento();
+
+function InstructivoProduccion(nombre,nombre_tabla){
+    Documento.call(this,nombre,nombre_tabla);
+}
+
+InstructivoProduccion.prototype = new Documento();
+
+function SubinstructivoProduccion(nombre,nombre_tabla){
+    Documento.call(this,nombre,nombre_tabla);
+}
+
+SubinstructivoProduccion.prototype = new Documento();

@@ -18,8 +18,7 @@
         <link rel="shortcut icon"  href="./images/1.ico" />
         
         <script src="documento.js"></script>
-        <!--script src="plano.js"></script>
-        <script src="materiales.js"></script-->
+       
     </head>
     <style>
     td.details-control {
@@ -49,8 +48,7 @@
         width: 100%;
         height: 100%;
    
-     }
-  
+      }
     </style>
     
 <body id = "pantallap">
@@ -59,7 +57,7 @@
             <div class="sidebar-content">
                
                 <div class="sidebar-item sidebar-brand">
-                    <a style="margin-left:9px;font-size:28px" href="#">SGPB</a>           
+                    <a style="margin-left:-1px;font-size:28px" href="#">SGPB</a>           
                 </div>
                
                 <div class="sidebar-item sidebar-header d-flex flex-nowrap" style="margin-left:-10px">
@@ -114,21 +112,66 @@
                                         </a>         
                                     </li>
                                     <li>
-                                        <a data-menu-item="dconsultas" onclick="Info_doc(material.nombre_tabla,material.nombre)" class="personal-menu-item dconsultasm" href="#">Lista de Materiales</a>
-                                        <script type="text/javascript">
-                                            var material = new Material("Lista de Materiales","materiales");
-                                        </script>    
-                                    </li>
-                                    <li>
                                         <a data-menu-item="dconsultas" onclick="Info_doc(manual.nombre_tabla,manual.nombre)" class="personal-menu-item dconsultasm" href="#">Manuales</a>
                                         <script type="text/javascript">
                                            var manual = new Manual("Manuales","manuales");
 
                                         </script>    
                                     </li>
+                                    <li>
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(material.nombre_tabla,material.nombre)" class="personal-menu-item dconsultasm" href="#">Lista de Materiales</a>
+                                        <script type="text/javascript">
+                                            var material = new Material("Lista de Materiales","materiales");
+                                        </script>    
+                                    </li>
+
+                                    <li>
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(instructivo_ensayo.nombre_tabla,instructivo_ensayo.nombre)" class="personal-menu-item dconsultasm" href="#">Instructivos de Ensayo</a>
+                                        <script type="text/javascript">
+                                            var instructivo_ensayo = new InstructivoEnsayo("Instructivos de Ensayo","instructivodeensayos");
+                                        </script>    
+                                    </li>
+                                    <li>
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(instructivo_produccion.nombre_tabla,instructivo_produccion.nombre)" class="personal-menu-item dconsultasm" href="#">Instructivos de Producción</a>
+                                        <script type="text/javascript">
+                                            var instructivo_produccion = new InstructivoProduccion("Instructivos de Producción","instructivodeproducciones");
+                                        </script>    
+                                    </li>
+
+                                    <li>
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(subinstructivo_produccion.nombre_tabla,subinstructivo_produccion.nombre)" class="personal-menu-item dconsultasm" href="#">Subinstructivos de Ensayo</a>
+                                        <script type="text/javascript">
+                                            var subinstructivo_produccion = new SubinstructivoProduccion("Subinstructivos de Producción","subinstructivodeproducciones");
+                                        </script>    
+                                    </li>
                                 </ul>
                                 
                             </div>    
+                        </li>
+                        <li id= "clickpendiente" class="sidebar-dropdown">
+                            <a href="#">
+                                <i class="fa fa-clock"></i>
+                                <span class="menu-text">Pendientes</span> 
+                                <i  class="fa fa-exclamation-triangle"></i>
+                            </a>
+                            <div class="sidebar-submenu">
+                        </li>
+                        <li>
+                            <a data-menu-item="altaprod" class="personal-menu-item profile altaprod" href="#">
+                                <i class="fa fa-laptop"></i>
+                                <span >Productos</span>
+                            </a>
+                            
+                        </li>       
+                        <li class="header-menu">
+                            <span>Extra</span>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa fa-book"></i>
+                                <span class="menu-text">Documentación</span>
+                               
+                            </a>
                         </li>
                     </ul>    
                 </div>    
@@ -184,7 +227,7 @@
                                 </div>
                             </div>
                             <div class='col-md-4'>
-                                <img style='margin-top:-170px' src='./images/logocolores3.png'>
+                                <!--img style='margin-top:-170px' src='./images/logocolores3.png'-->
                                 <div class='card' style='width: 18rem;margin-top: -10px'>
                                     <div class='card-header'>
                                         <strong>Estados</strong>
@@ -229,6 +272,7 @@
                     </div>   
                 </div>
                     <div id="content">
+                        
                        
                     </div>
             </div>
@@ -333,6 +377,176 @@
                 </div>
                 </div>
             </div>
+             <!--Modal Alta de un documento (plano, manual)-->
+            <div class="modal" id="MymodalAlta" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #999">
+                            <h5 class="modal-title">Alta</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div style="margin-top: 5px" class="row">
+                                    <div style="margin-left:12px" class="col-md-1">
+                                    <strong>Código</strong>
+                                    </div>
+                                    <div class="col-md-2">
+                                    <input id= "maxcodigo" style="margin-left: 20px;width: 100px;"></input>
+                                    </div>
+                                </div>  
+                            </div>
+                            <div style="margin-top: 10px" class="row">
+                                <div style="margin-left:-2px" class="col-md-1">
+                                    <strong>Descripción</strong>   
+                                </div>
+                                <div class="col-md-2">
+                                    <input id="descdoc" style="margin-left: 47px;width: 370px"></input>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px" class="row">
+                                <div class="col-md-2" style="margin-left:10px">
+                                    <strong>Ubicación</strong>   
+                                </div>
+                                <div class="col-md-2">
+                                    <input id="ubidoc" style="margin-left:-7px;width: 370px"></input>
+                                </div>  
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id ="altadoc" class="btn btn-primary" data-toggle="modal"  class="btn btn-secondary">Aceptar</button>
+                            <button type="button" id="CerrarAlta" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <!--Modal Alta Lista de Materiales-->
+            <div class="modal" id="MymodalAltam" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #999">
+                            <h5 class="modal-title">Alta</h5>      
+                        </div> 
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div style="margin-top: 5px" class="row">
+                                    <div style="margin-left:12px" class="col-md-1">
+                                        <strong>Producto</strong>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select id="comboproduct " class="Input" style="margin-left: 30px;width: 100px;">
+                                            
+                                        </select>
+                                    </div>
+
+                                    <div style="margin-left:68px" class="col-md-1">
+                                        <button id= "buscarlm" style="width:90px">Buscar
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                
+                                <div style="margin-top: 20px" class="row">
+                                    <div style="margin-left:22px" class="col-md-1">
+                                        <strong>Código</strong>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <input id="codigomat"  disabled= 'true' style="margin-left: 20px;width: 100px"></input>
+                                    </div>
+
+                                </div>
+                                
+                                
+                            </div>
+                            <div style="margin-top: 1px" class="row">
+                                
+                                <div style="margin-top: 8px" class="row">
+                                    <div class="col-md-2" style="margin-left:10px">
+                                        <strong style="margin-left:12px">Descripción</strong>   
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input id="desclmat" disabled= 'true' style="margin-left:13px;width: 370px"></input>
+                                    </div>  
+                                </div>
+
+                                <div style="margin-top: 10px" class="row">
+                                    <div class="col-md-2" style="margin-left:10px">
+                                        <strong style="margin-left:25px">Ubicación</strong>   
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input id="ubilmat" disabled= 'true' style="margin-left:13px;width: 370px"></input>
+                                    </div>  
+                                </div>
+                            </div>                     
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id ="altalmat" data-toggle="modal"  class="btn btn-primary">Aceptar</button>
+                            <button type="button" id="cerraraltalmat" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Modal Alta instructivo de ensayo-->
+        <div class="modal" id="MymodalAltaie" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #999">
+                        <h5 class="modal-title">Alta Instructivo de Ensayo</h5>      
+                    </div> 
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div style="margin-top: 5px" class="row">
+                                <div style="margin-left:1px" class="col-md-1">
+                                    <strong>Instructivo</strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <select id="comboensayo" name="comboensayo" class="Inputie" style="margin-left: 42px;width: 150px;">      
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px" class="row">
+                                <div style="margin-left:22px" class="col-md-1">
+                                    <strong>Código</strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <input id="codie"  disabled= 'true' style="margin-left: 20px;width: 100px"></input>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div style="margin-top: 1px" class="row">
+                            <div style="margin-top: 8px" class="row">
+                                <div class="col-md-2" style="margin-left:10px">
+                                    <strong style="margin-left:12px">Descripción</strong>   
+                                </div>
+                                <div class="col-md-2">
+                                    <input id="descie"  style="margin-left:13px;width: 370px"></input>
+                                </div>  
+                            </div>
+
+                            <div style="margin-top: 10px" class="row">
+                                <div class="col-md-2" style="margin-left:10px">
+                                    <strong style="margin-left:25px">Ubicación</strong>   
+                                </div>
+                                <div class="col-md-2">
+                                    <input id="ubiie"  style="margin-left:13px;width: 370px"></input>
+                                </div>  
+                            </div>
+                        </div>        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id ="altaie" data-toggle="modal"  class="btn btn-primary">Aceptar</button>
+                        <button type="button" id="cerrarie" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     
         </main>    
     </div>    
