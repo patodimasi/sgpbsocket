@@ -931,3 +931,25 @@ $("#altalmat").click(function(){
         });
     }
 });
+
+//------------------------------------------------------Activa el enter de los botones de busqueda--------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------
+$(document).ready(function(){
+    $("#codigo").keydown(function(e){ 
+        if(e.which === 13){
+            Consulta(codigo,nrorev,descripcion);
+        }
+    });
+
+    $("#nrorev").keydown(function(e){
+        if(e.which === 13){
+            Consulta(codigo,nrorev,descripcion);
+        }
+    });
+    
+    $("#descripcion").keydown(function(e){
+        if(e.which === 13){
+            Consulta(codigo,nrorev,descripcion);
+        }
+    });
+});    
