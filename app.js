@@ -108,6 +108,7 @@ app.get('/buscar',(req,res)=>{
                     "PLN_CODIGO":{$first: "$PLN_CODIGO"},
                     "PLN_NRO_REV" : {$first:"$PLN_NRO_REV"},
                     "PLN_DESCRIPCION" :{$first:"$PLN_DESCRIPCION"},
+                    "PLN_UBICACION" :{$first:"$PLN_UBICACION"},
                     "PLN_ESTADO":{$first:"$PLN_ESTADO"},
                     "PLN_USUARIO_ALTA":{$first:"$PLN_USUARIO_ALTA"},
                     "PLN_FECHA":{$first:"$PLN_FECHA"},
@@ -219,6 +220,7 @@ app.get('/buscarTodos',(req,res)=>{
             "PLN_CODIGO":{$first: "$PLN_CODIGO"},
             "PLN_NRO_REV" : {$first:"$PLN_NRO_REV"},
             "PLN_DESCRIPCION" :{$first:"$PLN_DESCRIPCION"},
+            "PLN_UBICACION" :{$first:"$PLN_UBICACION"},
             "PLN_ESTADO":{$first:"$PLN_ESTADO"},
             "PLN_USUARIO_ALTA":{$first:"$PLN_USUARIO_ALTA"},
             "PLN_FECHA":{$first:"$PLN_FECHA"},
@@ -329,7 +331,7 @@ app.get('/maxp',(req,res)=>{
 //--------------------------------------------------------------visualiza el maximo de un instructivo de ensayo---------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------------------
 app.get('/altaie', function(req, res){
-    //console.log(req.query.nombreensayo);
+    console.log("nombre del ensayo" + " " + req.query.nombreensayo);
     var  filtro = {}
 
     switch(req.query.nombreensayo) {
@@ -613,9 +615,82 @@ app.get('/Ubi', function(req, res) {
       );
 })
 
+//------------------------------------Muestra  la ubicacion actual de un documento------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------
+app.get('/modif_ubi', function(req, res) {
+    var modif_ubi = mongoose.model(req.query.nombre_tabla_modif_ubi);
+    modif_ubi.find({_id: req.query.ubiplano},function(err,plano){
+        if (err){
+            throw err;
+        }
+        
+        res.write(JSON.stringify(plano[0].PLN_UBICACION)); 
+        return res.end();   
+    })
+
+});
+//-------------------------------------------------Modifica la ubicacion de un documento-----------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------
+app.get('/aceptarmodif_ubi', function(req, res) {
+    
+    var msjerror = null;
+    var aceptarmodif_ubi = mongoose.model(req.query.nombre_tabla_acep_modif_ubi);
+    
+    aceptarmodif_ubi.updateOne({_id:req.query.aceptar_ubip},{$set:{PLN_UBICACION:req.query.ubi_modifp}}, function(err, result) {
+        if(err){
+            msjerror = "NO_OK"
+        }
+        else{
+            msjerror = "OK"
+            res.write(JSON.stringify(msjerror)); 
+            return res.end();   
+        }
+       
+      console.log(result);
+    });
+});
+
+//---------------------------------------------------Consulta los pendientes de aprobación de un documento---------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+app.get('/buscarTodos_pen',(req,res)=>{
+    console.log(req.query.nombre_tabla_consultat);
+    var consulta_pen= mongoose.model(req.query.nombre_tabla_consultat);
+   
+    consulta_pen.aggregate([
+        { 
+            $match : {PLN_ESTADO : "A"}
+        },
+        {$sort: {"PLN_NRO_REV":-1}},
+        
+        { $group: {
+            "_id": "$PLN_CODIGO",
+            "PLN_CODIGO":{$first: "$PLN_CODIGO"},
+            "PLN_NRO_REV" : {$first:"$PLN_NRO_REV"},
+            "PLN_DESCRIPCION" :{$first:"$PLN_DESCRIPCION"},
+            "PLN_ESTADO":{$first:"$PLN_ESTADO"},
+            "PLN_USUARIO_ALTA":{$first:"$PLN_USUARIO_ALTA"},
+            "PLN_FECHA":{$first:"$PLN_FECHA"},
+            "PLN_FECHA_APR": {$first:"$PLN_FECHA_APR"},
+            "PLN_USUARIO_APR": {$first:"$PLN_USUARIO_APR"},
+            "PLN_FECHA_REC": {$first:"$PLN_FECHA_REC"},
+            "PLN_USUARIO_REC": {$first:"$PLN_USUARIO_REC"},
+            "PLN_COMENTARIO" : {$first:"$PLN_COMENTARIO"}
+            
+        }},
+    ],  function(err,docs) {
+            console.log(docs);
+            res.write(JSON.stringify(docs));
+            return res.end();
+        }
+    );     
+
+});
+
 
 //----------------------------------------------------Usuarios------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+
 
 //-----------------------------------------------------Login usuarios-----------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
