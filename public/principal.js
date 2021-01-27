@@ -1,11 +1,27 @@
+//inicializacion de objetos tipo documento
+var plano = new Plano("Planos","planos");
+var manual = new Manual("Manuales","manuales");
+var material = new Material("Lista de Materiales","materiales");
+var instructivo_ensayo = new InstructivoEnsayo("Instructivos de Ensayo","instructivodeensayos");
+var instructivo_produccion = new InstructivoProduccion("Instructivos de Producción","instructivodeproducciones");
+var subinstructivo_produccion = new SubinstructivoProduccion("Subinstructivos de Producción","subinstructivodeproducciones");
+
+
 //login usuario
 $(document).ready(function(){
+    //agregado formulario modal para el cambio de ubicacion
+    $( ".page-wrapper" ).before(htmlModalUbicacion);
+    $( ".page-wrapper" ).before(htmlModalNuevaRev);
+    $( ".page-wrapper" ).before(htmlModalAltaDoc);
+    $( ".page-wrapper" ).before(htmlAltaListaMateriales);
+    $( ".page-wrapper" ).before(htmlAltaInstEnsayo);
+    //chequeo si existe el nombre del usuario
     if (sessionStorage["nombre"]){
       var nombre = sessionStorage["nombre"];
       var foto = sessionStorage["foto"];
       var label = sessionStorage["label"];
-      //console.log(foto);
        $('<p>'+ nombre +'</p>').appendTo('#usrnombre');
+       //Chequeo si existe la imagen del usuario sino cargo una default
        if(foto == ""){
         $("#imagenf").attr('src',"./images/user.jpg");
        }
@@ -22,29 +38,49 @@ $(document).ready(function(){
      $("#pantallap").addClass("disabledbutton");
        
     }
+    //Manejo contenedores en el arranque
+   $('#dconsultas').hide();
+   $('#content').show();
+    
+    //Cambio de foto
+   $("#file").change(Cambiofoto);
+  
 });
 
-// manejo de la sidebar
-$(document).ready(function() {
-   /* $('.sidebar div').click(function(e) {
-        $('#content').text($(this).text())
-    })
-    */
- /*   $('div#dconsultas').show();
-    $('body').on('click','a.personal-menu-item', function(e) {
-        e.preventDefault();
+function Cambiofoto() {  
+    var fd = new FormData();
+    var files = $('#file')[0].files[0];
+    console.log(files.name);
+  //  $('.custom-file-label').text(files.name);  
+    var nombre = sessionStorage["logon"];
+    fd.append('file',files);
     
-    var selectedItem = $(this).attr('data-menu-item'); 
-    
-    var $selected = $('#' + selectedItem).show();
-    $('.contents > div').not($selected).hide();
-  
-   });
-   */
-    $('#dconsultas').hide();
-    $('#content').show();
-    
-})
+   $.ajax({
+        //url: '/upload',
+        //url:"/upload?nombre="+nombre,
+        url:"/upload?"+nombre,
+        method: 'post',
+        data: fd,      
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(data){
+            console.log("upload sucess" + " " + data.data);
+            $("#imagenf").attr('src',data.data);
+            console.log($("#imagenf"));
+            
+            if(data.code == 2){
+                alert("Error al subir imagen el archivo tiene que tener extencion jpg|jpeg|png|gif");
+            }
+            else{
+                console.log("upload sucess" + " " + data.data);
+                $("#imagenf").attr('src',data.data);
+                console.log($("#imagenf"));
+                $('.custom-file-label').text(files.name);  
+            }
+        },
+    });    
+}
 
 function obtener_logon(){
     var codigo = sessionStorage["codigo"];
@@ -86,71 +122,7 @@ function obtener_logon(){
     })
     return  usuario;
 }
-//Muestra la cantidad de documentos pendientes de aprobacion
-/*$(document).ready(function() {
-    $("#clickpendiente").click(function() {
-      
-        console.log("llega");
-     
-        $.ajax( {
-            type: "GET",
-            url: '/maximotable',
-            dataType : 'json',
-       
-            success: function(res){
-                console.log("este es el res" + " " + res.res_plano);
-                $('#badge_plano').text(res.res_plano);
-                $('#badge_materiales').text(res.res_materiales);
-            }
-      
-        });
-            
-        
-    });
-    
-});
-*/
 
-$(document).ready(function(){
-    $("#file").change(function() {  
-        var fd = new FormData();
-        var files = $('#file')[0].files[0];
-        console.log(files.name);
-      //  $('.custom-file-label').text(files.name);  
-        var nombre = sessionStorage["logon"];
-        fd.append('file',files);
-        
 
-       $.ajax({
-            //url: '/upload',
-            //url:"/upload?nombre="+nombre,
-            url:"/upload?"+nombre,
-            method: 'post',
-            data: fd,      
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(data){
-            console.log("upload sucess" + " " + data.data);
-            $("#imagenf").attr('src',data.data);
-            console.log($("#imagenf"));
-            
-            if(data.code == 2){
-                alert("Error al subir imagen el archivo tiene que tener extencion jpg|jpeg|png|gif");
-            }
-            else{
-                console.log("upload sucess" + " " + data.data);
-                $("#imagenf").attr('src',data.data);
-                console.log($("#imagenf"));
-                $('.custom-file-label').text(files.name);  
-            
-            }
-            },
-            
-        });
-      
-    });
-
-});
 
 
