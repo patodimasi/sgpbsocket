@@ -526,6 +526,7 @@ function NuevaRev(item){
     $("#codigo_old_nr").val(infodp.PLN_CODIGO);
     $("#nrorev_old_nr").val(infodp.PLN_NRO_REV);
     $("#descripcion_old_nr").val(infodp.PLN_DESCRIPCION);
+    $("#ubicacion_old_nr").val(infodp.PLN_UBICACION);
     $("#falta_old_nr").val(infodp.PLN_FECHA);
     $("#usuarioa_old_nr").val(infodp.PLN_USUARIO_ALTA);
     $("#faprob_old_nr").val(infodp.PLN_FECHA_APR);
@@ -553,11 +554,12 @@ function Confirmarnr(){
     var PLN_CODIGO =  $("#codigo_old_nr").val();
     var PLN_DESCRIPCION =  $("#descripcion_new_nr").val();
     var PLN_NRO_REV =  parseInt($("#nuevarev_new_nr").val());
+    var PLN_UBICACION = $("#ubicacion_old_nr").val();
     var PLN_ESTADO = "A";
     var PLN_USUARIO_ALTA = logon;
     var PLN_USUARIO_APR =  "";
     var PLN_FECHA_APR =  "";
-    var PLN_UBICACION = "";
+    
     var PLN_COMENTARIO = $("#comentarios_nr").val();
     
     $.ajax({
@@ -606,7 +608,8 @@ function materialesalta(){
 
 //--------------------------------Busca el maximo de cada producto en una lista de materiales---------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------------
-$("#buscarlm").click(function(){
+function buscarlm(){
+//$("#buscarlm").click(function(){
 
     $("#codigomat" ).attr("disabled",false);
     $("#desclmat" ).attr("disabled",false);
@@ -629,18 +632,19 @@ $("#buscarlm").click(function(){
       
         
     });
-  
-});
+};  
+//});
 //------------------------------------------------limpiar el evento onchange del combobox--------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
-$(".Input").change(function(){
-    $('#codigomat').val("");
-    $('#codigomat').attr("disabled",true);
-    $("#desclmat" ).attr("disabled",true);
-    $("#ubilmat" ).attr("disabled",true);
-    
-});
-
+function Input(){
+    $(".Input").change(function(){
+        $('#codigomat').val("");
+        $('#codigomat').attr("disabled",true);
+        $("#desclmat" ).attr("disabled",true);
+        $("#ubilmat" ).attr("disabled",true);
+        
+    });
+};
 //------------------------------------------------Llena el combo box de la lista de materiales de dar de alta--------------------
 //-------------------------------------------------------------------------------------------------------------------------------
 
@@ -681,7 +685,9 @@ function docalta(nombre_tabla_maximo){
 
 //------------------------------------Alta de un plano, manual--------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
-$("#altadoc").click(function(){
+//$("#altadoc").click(function(){
+function Altadoc(){
+    console.log("llega al alta del documento");
      var codigo =  $("#maxcodigo").val();
       var ubicacion = $("#ubidoc").val().trim();
       var descripcion = $("#descdoc").val();
@@ -720,8 +726,8 @@ $("#altadoc").click(function(){
   
           });
       }
-});
-
+//});
+}
 //---------------------------Valida la ubicacion al dar de alta de un documento------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------
 function validar_ubicacion(ubicacion){
@@ -766,12 +772,15 @@ function Btnalta(){
 //----------------------------------------------------------------------------------------------------------------------------------
 function instructivosalta(nombre){
     $('#MymodalAltaie').modal();
+    $("#descie").val("");
+    $("#ubiie").val("");
     // lleno el comboboox
     $('.Inputie').empty();
     $('.Inputie').append('<option>' + "Ensayo Recepción"  + '</option');
     $('.Inputie').append('<option>' + "Ensayo Producción"  + '</option');
     $('.Inputie').append('<option>' + "Ensayo Final"  + '</option');
 
+    
     var nombreensayo = "Ensayo Recepción"
     //traigo el IB10-01 por defecto
     $.ajax({
@@ -783,7 +792,6 @@ function instructivosalta(nombre){
 
         success: function(res){
         //obtengo en la respuesta el maximo y lo muestro en el formulario  
-            console.log("resultado" +  " " + res);
             $("#codie").val(res);
             
         }
@@ -793,7 +801,8 @@ function instructivosalta(nombre){
 
 //---------------------------------------------------Realiza el alta  de un instructivo de ensayo en la base de datos-----------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
-$("#altaie").click(function(){
+
+function Altaie(){
     var codigo =  $('#codie').val();
     var descripcion =  $('#descie').val();
     var ubicacion =  $('#ubiie').val().trim();
@@ -814,58 +823,30 @@ $("#altaie").click(function(){
             dataType : 'json',
             data: {codigo,descripcion,ubicacion,logon,nombre_tabla_alta},
             success: function (data) {
-                if(data == "NO_OK"){
-                    alert("Error al crear un nuevo instructivo de ensayo");
-                } 
-                else{
-                    $('#MymodalAltaie').modal('hide'); 
-                    alert("El documento" + " " + codigo + " " +  "se dio de alta satisfactoriamente");
-                    $("#descie").val("");
-                    $("#ubiie").val("");
-
+               if(data == "OK"){
+                  
+                $('#MymodalAltaie').modal('hide'); 
+                   // alert("El alta del documento" + " " + codigo + " " + "se dio de alta satisfactoriamente"); 
+                   alert("El documento" + " " + codigo + " " +  "se dio de alta satisfactoriamente");
                 }
-            
+                else{
+                    alert("Error al crear el documento" + " " + codigo);
+                }
+    
             },
-        
             
         });
     }
-
-});
+};
+//});
 //----------------------------------------------------Cierra el form del alta del instructivo y limpia--------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
-$("#cerrarie").click(function(){
+function Cerrarie(){
     $('.Inputie').empty();
     $('#codie').val("");
     $('#descie').val("");
     $('#ubiie').val("");
-});
-
-//---------------------------------------------------Evento on change del combo donde carga el maximo de cada instructivo de ensayo----------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-$(".Inputie").change(function(){
-    
-    var nombreensayo = $('select[name="comboensayo"] option:selected').text()
-  
-    $.ajax({
-        method : "GET",
-        async:true,
-        url:"/altaie",
-        dataType : 'json',
-        data:{nombreensayo},
-
-        success: function(res){
-        //obtengo en la respuesta el maximo y lo muestro en el formulario  
-            console.log("resultado" +  " " + res);
-            $("#codie").val(res);
-            $("#descie").val("");
-            $("#ubiie").val("");
-            
-        }
-
-    });
-
-});
+}
 
 //-----------------------------------------------Valida la ubicacion de un documento antes de dar de alta-----------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -884,10 +865,10 @@ function validar_ubicacion(ubicacion){
      return resultado;
  };
  
-//-------------------------------------------------------Confirmar alta de un documento-----------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------
-//----------------------------------------------Alta de una lista de materiales en la base de datos------------------------------------
-$("#altalmat").click(function(){
+//-------------------------------------------------------Confirmar alta de un documento----------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------Alta de una lista de materiales en la base de datos-----------------------------------------
+function Altalmat(){
     var codigo =  $('#codigomat').val();
     var descripcion =  $('#desclmat').val();
     var ubicacion =  $('#ubilmat').val().trim();
@@ -919,6 +900,7 @@ $("#altalmat").click(function(){
                     $('#codigomat').val("");
                     $('#desclmat').val("");
                     $('#ubilmat').val("");
+                    $('.Input').empty();
 
                     $("#codigomat" ).attr("disabled",true);
                     $("#desclmat" ).attr("disabled",true);
@@ -930,8 +912,7 @@ $("#altalmat").click(function(){
             
         });
     }
-});
-
+};
 //------------------------------------------------------Activa el enter de los botones de busqueda--------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------
 $(document).ready(function(){
@@ -953,3 +934,456 @@ $(document).ready(function(){
         }
     });
 });    
+
+// -----------------------  Muestra el formulario para modificar la ubicacion ----------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------
+function Mostrarmodif(item){
+    $('#myModalU').modal();
+  
+    infoubi = $(item).attr("id");
+    id_p = (infoubi.split('/')[0]);
+    var ubiplano = (infoubi.split('/')[1]);
+    window["ubiplano"] = ubiplano;
+    var nombre = $("#bpb").val();
+    var nombre_tabla_modif_ubi = nombre; 
+              
+    console.log("esta es la ubicaconactual" + " " + ubiplano)
+    $.ajax({
+        method : "GET",
+        async:true,
+        url:"/modif_ubi",
+        dataType : 'json',
+        data:{ubiplano,nombre_tabla_modif_ubi},
+
+        success: function(res){ 
+            console.log("esta es la respuesta" + res);
+            $('#ubicacion').val(res);
+           
+        }
+    });
+
+};
+
+//---------------------------------------------------Evento on change del combo donde carga el maximo de cada instructivo de ensayo----------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+
+function Inputie(){
+    $(".Inputie").change(function(){
+        console.log("llega al exchange del combo box del ensayo");
+        var nombreensayo = $('select[name="comboensayo"] option:selected').text()
+    
+        $.ajax({
+            method : "GET",
+            async:true,
+            url:"/altaie",
+            dataType : 'json',
+            data:{nombreensayo},
+    
+            success: function(res){
+            //obtengo en la respuesta el maximo y lo muestro en el formulario  
+                console.log("resultado" +  " " + res);
+                $("#codie").val(res);
+                $("#descie").val("");
+                $("#ubiie").val("");
+                
+            }
+    
+        });
+    
+    });
+    
+};
+
+//---------------------------------------------------Función que trae el modal del alta del instructivo de ensayo-----------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+function htmlAltaInstEnsayo(){
+    return  '<div class="modal" id="MymodalAltaie" tabindex="-1" role="dialog">'+
+                '<div class="modal-dialog modal-dialog-centered" role="document">'+
+                    '<div class="modal-content">'+
+                        '<div class="modal-header" style="background-color: #999">'+
+                            '<h5 class="modal-title">Alta Instructivo de Ensayo</h5>'+      
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="container-fluid">'+
+                                '<div style="margin-top: 5px" class="row">'+
+                                    '<div style="margin-left:1px" class="col-md-1">'+
+                                        '<strong>Instructivo</strong>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<select id="comboensayo" onclick="Inputie()" name="comboensayo" class="Inputie" style="margin-left: 42px;width: 150px;">'+  
+                                       //'<select id="comboensayo"  name="comboensayo" class="Inputie" style="margin-left: 42px;width: 150px;">'+       
+                                        '</select>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div style="margin-top: 20px" class="row">'+
+                                    '<div style="margin-left:22px" class="col-md-1">'+
+                                        '<strong>Código</strong>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="codie"  disabled= "true" style="margin-left: 20px;width: 100px"></input>'+
+                                    '</div>'+
+                                '</div>'+
+
+                            '</div>'+
+
+                            '<div style="margin-top: 1px" class="row">'+
+                                '<div style="margin-top: 8px" class="row">'+
+                                    '<div class="col-md-2" style="margin-left:10px">'+
+                                        '<strong style="margin-left:12px">Descripción</strong>'+   
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="descie"  style="margin-left:13px;width: 370px"></input>'+
+                                    '</div>'+  
+                                '</div>'+
+
+                                '<div style="margin-top: 10px" class="row">'+
+                                    '<div class="col-md-2" style="margin-left:10px">'+
+                                        '<strong style="margin-left:25px">Ubicación</strong>'+   
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="ubiie"  style="margin-left:13px;width: 370px"></input>'+
+                                    '</div>'+  
+                                '</div>'+
+
+                            '</div>'+    
+                            
+                        '</div>'+ 
+
+                        '<div class="modal-footer">'+
+                            '<button type="button" id ="altaie" onclick="Altaie()" data-toggle="modal"  class="btn btn-primary">Aceptar</button>'+
+                            '<button type="button" id="cerrarie" onclick="Cerrarie()" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>';
+}
+
+//---------------------------------------------------Funcion que trae el modal del alta de la lista de materiales------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+function htmlAltaListaMateriales(){
+    return  '<div class="modal" id="MymodalAltam" tabindex="-1" role="dialog">'+
+                '<div class="modal-dialog modal-dialog-centered" role="document">'+
+                    '<div class="modal-content">'+
+                        '<div class="modal-header" style="background-color: #999">'+
+                            '<h5 class="modal-title">Alta</h5>'+      
+                        '</div>'+ 
+                        '<div class="modal-body">'+
+                            '<div class="container-fluid">'+
+                                '<div style="margin-top: 5px" class="row">'+
+                                    '<div style="margin-left:12px" class="col-md-1">'+
+                                        '<strong>Producto</strong>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<select id="comboproduct " onclick="Input()" class="Input" style="margin-left: 30px;width: 100px;">'+            
+                                        '</select>'+
+                                    '</div>'+
+                                    '<div style="margin-left:68px" class="col-md-1">'+
+                                        '<button id= "buscarlm" onclick="buscarlm()" style="width:90px">Buscar'+
+                                            '<i class="fa fa-search"></i>'+
+                                        '</button>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div style="margin-top: 20px" class="row">'+
+                                    '<div style="margin-left:22px" class="col-md-1">'+
+                                        '<strong>Código</strong>'+
+                                    '</div>'+
+
+                                    '<div class="col-md-2">'+
+                                        '<input id="codigomat"  disabled= "true" style="margin-left: 20px;width: 100px"></input>'+
+                                    '</div>'+
+
+                                '</div>'+
+                            '</div>'+    
+
+                            '<div style="margin-top: 1px" class="row">'+
+                                
+                                '<div style="margin-top: 8px" class="row">'+
+                                    '<div class="col-md-2" style="margin-left:10px">'+
+                                        '<strong style="margin-left:12px">Descripción</strong>'+  
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="desclmat" disabled= "true" style="margin-left:13px;width: 370px"></input>'+
+                                    '</div>'+  
+                                '</div>'+
+
+                                '<div style="margin-top: 10px" class="row">'+
+                                    '<div class="col-md-2" style="margin-left:10px">'+
+                                        '<strong style="margin-left:25px">Ubicación</strong>'+   
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="ubilmat" disabled= "true" style="margin-left:13px;width: 370px"></input>'+
+                                    '</div>'+  
+                                '</div>'+
+                            '</div>'+                     
+                        '</div>'+    
+                        '<div class="modal-footer">'+
+                            '<button type="button" id ="altalmat" onclick="Altalmat()" data-toggle="modal"  class="btn btn-primary">Aceptar</button>'+
+                            '<button type="button" id="cerraraltalmat" onclick= "Cerraraltalmat()" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>';
+}
+
+function Cerraraltalmat(){
+    $('.Input').empty();
+    $('#codigomat').val("");
+    $('#desclmat').val("");
+    $('#ubilmat').val("");
+}
+
+//----------------------------------------------------Función que trae el modal del alta de un socumento ---------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+function htmlModalAltaDoc(){
+    return  '<div class="modal" id="MymodalAlta" tabindex="-1" role="dialog">'+  
+                '<div class="modal-dialog modal-dialog-centered" role="document">'+
+                    '<div class="modal-content">'+
+                        '<div class="modal-header" style="background-color: #999">'+
+                            '<h5 class="modal-title">Alta</h5>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="container-fluid">'+
+                                '<div style="margin-top: 5px" class="row">'+
+                                    '<div style="margin-left:12px" class="col-md-1">'+
+                                        '<strong>Código</strong>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id= "maxcodigo" style="margin-left: 20px;width: 100px;"></input>'+
+                                    '</div>'+
+                                '</div>'+  
+                            '</div>'+
+                            '<div style="margin-top: 10px" class="row">'+
+                                '<div style="margin-left:-2px" class="col-md-1">'+
+                                    '<strong>Descripción</strong>'+   
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<input id="descdoc" style="margin-left: 47px;width: 370px"></input>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div style="margin-top: 10px" class="row">'+
+                                '<div class="col-md-2" style="margin-left:10px">'+
+                                    '<strong>Ubicación</strong>'+   
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<input id="ubidoc" style="margin-left:-7px;width: 370px"></input>'+
+                                '</div>'+  
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" id ="altadoc" onclick="Altadoc()"  class="btn btn-primary" data-toggle="modal"  class="btn btn-secondary">Aceptar</button>'+
+                            '<button type="button" id="CerrarAlta" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>';   
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------Función que trae el modal para cambiar la ubicacion del documento-------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+function htmlModalUbicacion (){
+    return  '<div class="modal fade" id="myModalU">' +
+                '<div class="modal-dialog modal-dialog-centered">'+ 
+                    '<div class="modal-content">'+
+                        '<div class="modal-header" style="background-color: #999">'+
+                            '<strong> Modificar ubicación </strong>'+           
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<label>Ubicación Actual</label>'+
+                            '<input type="text" id="ubicacion" size="60"/>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" id="Aceptarmodif" onclick="Aceptarmodif()"  class="btn btn-primary">Aceptar</button>'+
+                            '<button type="button" id="Cerrar" class="btn btn-secondary"  data-dismiss="modal">Cerrar</button>'+
+                        '</div>'+
+                        '<div class="container">'+
+                            '<label id="Resubi"></label>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>' 
+            
+}
+
+//-------------------------------------------------Función que trae el modal de la nueva revision-------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+function htmlModalNuevaRev(){
+    return  '<div class="modal fade" id="myModal_nr" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+                '<div class="modal-dialog modal-dialog-centered" role="document">'+
+                    '<div class="modal-content">'+
+                        '<div class="modal-header" style="background-color: #999">'+
+                            '<h5 class="modal-title" id="exampleModalLongTitle">Nueva revisión </h5>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="container-fluid">'+
+                                '<div style="margin-top: 5px" class="row">'+
+                                    '<div style="margin-left:15px" class="col-md-1">'+
+                                        '<strong>Código</strong>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id= "codigo_old_nr" disabled= "true" style="margin-left: 20px;width: 100px;"></input>'+
+                                    '</div>'+
+                                '</div>'+  
+                                '<div style="margin-top: 10px" class="row">'+
+                                    '<div style="margin-left:20px" class="col-md-1">'+
+                                        '<strong>N°Rev</strong>'+   
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="nrorev_old_nr" disabled= "true" style="margin-left: 15px;width: 100px"></input>'+
+                                    '</div>'+
+                                '</div>'+
+
+                                '<div style="margin-top: 10px" class="row">'+
+                                   '<div class="col-md-2" style="margin-left:-15px">'+
+                                        '<strong>Descripción</strong>'+   
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="descripcion_old_nr"  disabled= "true" style="margin-left:10px;width: 367px"></input>'+
+                                    '</div>'+  
+                                '</div>'+
+
+                               '<div style="margin-top: 10px" class="row">'+
+                                    '<div class="col-md-2" style="margin-left:-15px">'+
+                                        '<strong style="margin-left:10px">Ubicación</strong>'+   
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<input id="ubicacion_old_nr"  disabled= "true" style="margin-left:10px;width: 367px"></input>'+
+                                    '</div>'+ 
+                                '</div>'+
+                                
+                                '<div style="margin-top: 10px" class= "row">'+
+                                    '<div style="margin-left:20px" class="col-md-1">'+
+                                        '<strong>F.Alta</strong>'+  
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<input id="falta_old_nr"  disabled= "true" style="margin-left: 15px;width: 100px"></input>'+
+                                    '</div>'+
+                                    '<div style="margin-top:3px;margin-left:-20px" class="col-md-2">'+
+                                        '<strong>Usuario</strong>'+    
+                                    '</div>'+
+                                    '<div style="margin-left:-5px;width: 100px;" class="col-md-2">'+
+                                        '<input id="usuarioa_old_nr"  disabled= "true"></input>'+
+                                    '</div>'+
+                                '</div>'+
+
+                                '<div style="margin-top: 10px" class= "row">'+
+                                    '<div style="margin-left:-20px" class="col-md-1">'+
+                                        '<strong>F.Aprobación</strong>'+   
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<input id="faprob_old_nr" disabled= "true" style="margin-left: 55px;width: 100px"></input>'+
+                                    '</div>'+
+                                    '<div style="margin-top:3px;margin-left:20px" class="col-md-2">'+
+                                        '<strong>Usuario</strong>'+    
+                                    '</div>'+
+                                    '<div style="margin-left:-5px;width: 100px;" class="col-md-2">'+
+                                        '<input id="usuarioapr_old_nr"  disabled= "true"></input>'+
+                                    '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div style="top:20px;;margin-left:-5px;width:470px" class="alert alert-dark" role="alert">'+
+                                    '<strong>Nueva revisión del documento</strong>'+  
+                                '</div>'+
+                                
+                                '<div style="margin-left:-3px" class="container-fluid">'+
+                                    '<div style="margin-top:30px" class="row">'+
+                                        '<div style="margin-left:25px" class="col-md-2">'+
+                                            '<strong>N°Rev</strong>'+
+                                        '</div>'+
+                                        '<div class="col-md-2">'+
+                                            '<input id="nuevarev_new_nr" type="number" disabled= "true" style="width: 100px;margin-left:-25px"></input>'+
+                                        '</div>'+
+                                        '<div style="margin-left:18px" class="col-md-4">'+
+                                            '<strong>Fecha Alta</strong>'+
+                                        '</div>'+
+                                        '<div style="margin-right: 10px" class="col-md-2">'+
+                                            '<input id="fechaalta_new_nr" disabled= "true" style="width: 175px;margin-left:-80px"></input>'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div style="margin-top: 10px" class="row">'+
+                                        '<div style="margin-left:-10px" class="col-md-2">'+
+                                            '<strong>Descripción</strong>'+
+                                        '</div>'+
+                                        '<div class="col-md-2">'+
+                                            '<input id="descripcion_new_nr" disabled= "true" style="margin-left:10px;width: 373px"></input>'+
+                                        '</div>'+  
+                                    '</div>'+
+                                    '<div style="margin-top: 10px" class="row">'+
+                                            '<strong><label style="margin-left:5px" for="exampleFormControlTextarea1">Comentarios</label></strong>'+
+                                            '<textarea class="form-control" id="comentarios_nr" rows="3"></textarea>'+
+                                    '</div>'+
+                                '</div>'+
+
+                            '</div>'+   
+                            
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-primary" onclick="Confirmarnr()" id="signin">Aceptar</button>'+
+                                '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>'+
+                            '</div>'+
+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+
+            '</div>';
+}
+
+//--------------------------------------------------Acepta la modificacion de la ubicacion--------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+
+function Aceptarmodif(){
+    aceptar_ubip = window["ubiplano"];
+    ubi_modifp = $('#ubicacion').val().trim();
+
+    var nombre = $("#bpb").val();
+    var nombre_tabla_acep_modif_ubi = nombre;
+    
+    if(validar_ubicacion(ubi_modifp) == false){
+        alert("La ubicacion del documento tiene que comenzar con //BOHERDISERVER")
+        $('#ubicacion').val("")
+    }
+    else{
+
+        $.ajax({
+            method : "GET",
+            async:true,
+            url:"/aceptarmodif_ubi",
+            dataType : 'json',
+            data:{aceptar_ubip,ubi_modifp,nombre_tabla_acep_modif_ubi},
+
+            success: function(res){
+                if (res  == "OK"  ){
+                
+                    alert("La modificación de la ubicación del documento se realizó correctamente");
+                
+                }
+                else{
+                    alert("Error al realizar la  modificación de la ubicación del documento");
+                }
+            
+            }
+        
+        })
+    
+        $('#myModalU').modal('hide');  
+        console.log("cierro modal de ubicacion");
+    }
+    
+};
+
+function Info_doc(nombre_tabla,titulo){    
+    $('#dconsultas').show();
+    $('#content').hide(); 
+    $('#dpendientes').hide(); 
+    $('#codigo').val("");
+    $('#nrorev').val("");
+    $('#descripcion').val("");       
+    $('#example').dataTable().fnDestroy();
+    $("#example > tbody").html("");
+ //   console.log("este es el nombre del doc" + " " + titulo);
+  //  console.log("este es el nombre de la tabla" + " " + nombre_tabla);
+    $('#titulo').text(titulo);
+    $('#bpb').val(nombre_tabla);
+    
+}    
