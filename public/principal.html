@@ -134,7 +134,35 @@
                             <div class="sidebar-submenu">
                                 <ul>
                                     <li>
-                                        <a  data-menu-item="dpendientes" onclick="Info_pen(plano.nombre_tabla,plano.nombre)" class="personal-menu-item dpendientes" href="#">Planos</a>                     
+                                        <a  data-menu-item="dpendientes" onclick="Info_pen(plano.nombre_tabla,plano.nombre)" class="personal-menu-item dpendientes" href="#">Planos 
+                                            <span id="badge_planos" class= "badge badge-pill badge-warning"></span>   
+                                        </a>                 
+                                    </li>
+                                    <li>
+                                        <a data-menu-item="dpendientes" onclick="Info_pen(manual.nombre_tabla,manual.nombre)" class="personal-menu-item dpendientes" href="#">Manuales
+                                            <span id="badge_manuales" class= "badge badge-pill badge-warning "></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a data-menu-item="dpendientes" onclick="Info_pen(material.nombre_tabla,material.nombre)" class="personal-menu-item dpendientes" href="#">Lista de Materiales
+                                            <span id="badge_materiales" class= "badge badge-pill badge-warning"></span>  
+                                        </a> 
+                                    </li>
+                                    <li>
+                                        <a data-menu-item="dpendientes" onclick="Info_pen(instructivo_ensayo.nombre_tabla,instructivo_ensayo.nombre)" class="personal-menu-item dpendientes" href="#">Instructivos de Ensayo 
+                                            <span id="badge_instructivodeensayos" class= "badge badge-pill badge-warning"></span> 
+                                        </a> 
+                                    </li>
+                                    <li>
+                                        <a data-menu-item="dpendientes" onclick="Info_pen(instructivo_produccion.nombre_tabla,instructivo_produccion.nombre)" class="personal-menu-item dpendientes" href="#">Instructivos de Producción   
+                                            <span id="badge_instructivodeproducciones" class= "badge badge-pill badge-warning"></span> 
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-menu-item="dpendientes" onclick="Info_pen(subinstructivo_produccion.nombre_tabla,subinstructivo_produccion.nombre)" class="personal-menu-item dpendientes" href="#">Subinstructivos de Ensayo
+                                            <span id="badge_subinstructivodeproducciones" style="margin-left: 7px;" class= "badge badge-pill badge-warning"></span>
+                                        </a>  
                                     </li>
                                 </ul>
                             </div> 
@@ -158,7 +186,12 @@
                         </li>
                     </ul>    
                 </div>    
-            </div>    
+            </div>  
+            
+            
+
+
+            
         </nav>
         <!-- page-content  -->
         <main  class="page-content pt-2">

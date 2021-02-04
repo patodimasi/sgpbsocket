@@ -71,7 +71,7 @@ function Consulta(){
                 console.log("The values for each cell in that row are: " + JSON.stringify(updatedRow.data()));
                 var codigo = (updatedRow.data().PLN_CODIGO);
                 var descripcion = (updatedRow.data().PLN_DESCRIPCION);
-                var nombre_tabla_descripcion = "planos";
+                var nombre_tabla_descripcion = nombre;
 
                 $.ajax({
                     method : "GET",
@@ -116,7 +116,7 @@ function Consulta(){
 };
 
 //-------------------------------------------Detalle de cada documento--------------------------------------------------------------
- //--------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
  
  function Formatdetalle(rowData){
     var nombre = $("#bpb").val();
@@ -137,6 +137,23 @@ function Consulta(){
             success: function(res){
                 //aca tengo todas las versiones de los planos
                 var jsondetalle = JSON.parse(res);
+
+                function sortJSON(data, key, orden) {
+                    return data.sort(function (a, b) {
+                        var x = a[key],
+                        y = b[key];
+                
+                        if (orden === 'asc') {
+                            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                        }
+                
+                        if (orden === 'desc') {
+                            return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+                        }
+                    });
+                }
+
+                var oJSON = sortJSON(jsondetalle, 'PLN_NRO_REV', 'asc');
               //  console.log("es el jsondetalle" + "" + jsondetalle);
                 var tbody = '';
                 tbody += '<table id="tabledetalle" class="table">';

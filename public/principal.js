@@ -7,6 +7,26 @@ var instructivo_produccion = new InstructivoProduccion("Instructivos de Producci
 var subinstructivo_produccion = new SubinstructivoProduccion("Subinstructivos de Producción","subinstructivodeproducciones");
 
 
+function Obtener_Badge(){
+    $.ajax( {
+        type: "GET",
+        url: '/maximobadge',
+        
+      
+        success: function(res){
+            var jsobadge = JSON.parse(res);
+          
+            $('#badge_planos').text(jsobadge.res_plano);
+            $('#badge_materiales').text(jsobadge.res_materiales);
+            $('#badge_manuales').text(jsobadge.res_manuales);
+            $('#badge_instructivodeensayos').text(jsobadge.res_instructivodeensayos);
+            $('#badge_instructivodeproducciones').text(jsobadge.res_instructivodeproducciones);
+            $('#badge_subinstructivodeproducciones').text(jsobadge.res_subinstructivodeproducciones);
+
+        }
+ 
+    });    
+}
 //login usuario
 $(document).ready(function(){
     //agregado formulario modal para el cambio de ubicacion
@@ -15,6 +35,11 @@ $(document).ready(function(){
     $( ".page-wrapper" ).before(htmlModalAltaDoc);
     $( ".page-wrapper" ).before(htmlAltaListaMateriales);
     $( ".page-wrapper" ).before(htmlAltaInstEnsayo);
+
+    //Aca tendria qie estar los badge de cada documento
+
+    Obtener_Badge();  
+
     //chequeo si existe el nombre del usuario
     if (sessionStorage["nombre"]){
       var nombre = sessionStorage["nombre"];
