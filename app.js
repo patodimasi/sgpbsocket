@@ -17,6 +17,7 @@ var program = require('commander');
 
 var multer = require("multer");
 var sharp = require('sharp');
+var async = require('async');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb){
@@ -407,6 +408,57 @@ app.get('/maxdoc',(req,res)=>{
    
 });
 
+//----------------------------------------------------Trae los badges de todos los docuentos------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+app.get('/maximobadge',(req,res)=>{
+    var Resultdoc = null;
+    
+    async.parallel([
+        function(callback){
+            planos.find({PLN_ESTADO : "A"},callback);
+           
+        },
+        
+        function(callback){
+            materiales.find({PLN_ESTADO : "A"},callback);
+            
+        },
+        function(callback){
+            manuales.find({PLN_ESTADO : "A"},callback);
+            
+        },
+        function(callback){
+            instructivodeensayos.find({PLN_ESTADO : "A"},callback);
+            
+        },
+        function(callback){
+            instructivodeproducciones.find({PLN_ESTADO : "A"},callback);
+            
+        },
+        function(callback){
+            subinstructivodeproducciones.find({PLN_ESTADO : "A"},callback);
+            
+        },
+
+    ],
+    function(err, results){
+        Resultdoc =
+        {
+            res_plano : results[0].length,
+            res_materiales : results[1].length,
+            res_manuales : results[2].length,
+            res_instructivodeensayos : results[3].length,
+            res_instructivodeproducciones : results[4].length,
+            res_subinstructivodeproducciones : results[4].length,
+        }
+       
+        res.write(JSON.stringify(Resultdoc));
+        return res.end();
+       
+    });
+});
+
 //-----------------------------------------------------Trae todos los productos para dar de alta una lista de materiales---------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 app.get('/traerprod',(req,res)=>{
@@ -685,11 +737,31 @@ app.get('/buscarTodos_pen',(req,res)=>{
     );     
 
 });
+//------------------------------------------------- Consulta de pendiente de aprobacion en el  detalle----------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/detallehisto_pen',(req,res)=>{
+    
+    //traigo todos los planos que coincidan con la busqueda, ya no tengo dos tablas
+    var groupModel_dpen = mongoose.model(req.query.nombre_tabla_detalle);
+
+    groupModel_dpen.aggregate([
+        { 
+            $match : {PLN_ESTADO : "A",PLN_CODIGO:req.query.name}
+        },
+
+     
+    ],  function(err,docs) {
+            res.write(JSON.stringify(docs));
+            return res.end();
+        }
+    );     
+  
+});
 
 
-//----------------------------------------------------Usuarios------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------Usuarios-------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 //-----------------------------------------------------Login usuarios-----------------------------------------------------------
