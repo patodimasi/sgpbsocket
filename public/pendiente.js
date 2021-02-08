@@ -352,6 +352,7 @@ function Info_pen(nombre_tabla,titulo){
     $('#dpendientes').show();
     $('#content').hide(); 
     $('#dconsultas').hide(); 
+    $('#altaprod').hide();
    // $('#examplespen').dataTable().fnDestroy();
     $("#examplespen > tbody").html("");
     $('#titulopen').text(titulo);
