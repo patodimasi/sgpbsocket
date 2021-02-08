@@ -168,7 +168,7 @@
                             </div> 
                         </li>
                         <li>
-                            <a data-menu-item="altaprod" class="personal-menu-item profile altaprod" href="#">
+                            <a data-menu-item="altaprod"  onclick="Info_altaprod()" class="personal-menu-item profile altaprod" href="#">
                                 <i class="fa fa-laptop"></i>
                                 <span >Productos</span>
                             </a>
@@ -188,14 +188,11 @@
                 </div>    
             </div>  
             
-            
-
-
-            
         </nav>
         <!-- page-content  -->
         <main  class="page-content pt-2">
             <div class="container-fluid p-5 contents">
+                 <!-- Consultas  -->
                 <div id="dconsultas">
                     <div class='row'>
                         <div class='form-group col-md-12'>
@@ -271,7 +268,7 @@
                         </table>
                     </div>   
                 </div>
-
+                 <!-- Pendientes -->
                 <div id="dpendientes">
                     
                     <div class='row'>
@@ -295,6 +292,34 @@
                         </div>
                     </div>    	
                 </div>    
+                 <!-- Productos -->
+                <div id="altaprod" >
+                    <div class='row'>
+                        <div class='form-group col-md-12'>
+                            <h2>Alta</h2>
+                        </div>
+                    </div>
+                    <div class='row'>
+                    </div>
+                    <div class='card-body'>
+                    </div>
+                    <table align='left' class='table table-responsive-md table-sm table-bordered'  id='makeEditable'>
+                        <thead>
+                            <tr>
+                                <th style='display:none'>id</th>
+                                <th style=' text-align: center'>Fecha</th>
+                                <th style=' text-align: center'>Nombre</th>
+                                <th style=' text-align: center'>Descripción</th>     
+                                     
+                            </tr>
+                        </thead>
+                        <tbody id = foo>
+            
+        
+                        </tbody>
+                    </table>    
+                    <span style='float:right'><button id='but_add'  class='btn btn-danger'>Agregar producto</button></span>
+                </div>  
 
                 <div id="content">
                          
@@ -316,11 +341,12 @@
     </script>
     <script src="//malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
     
+    <script src="./scripts/bootstable2.js" ></script>
     <script src="./scripts/main.js"></script>
     <script src="/socket.io/socket.io.js" charset="utf-8"></script>
     <script src="consultap.js"></script>
     <script src="pendiente.js"></script>
-    <!--script src="documento.js"></script-->
+    <script src="altaprod.js"></script>
     <script src="principal.js"></script>
     <script type="text/javascript" languaje="javascript" src="./scripts/jquery.dataTables.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css"> 
