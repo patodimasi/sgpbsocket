@@ -459,18 +459,6 @@ app.get('/maximobadge',(req,res)=>{
     });
 });
 
-//-----------------------------------------------------Trae todos los productos para dar de alta una lista de materiales---------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-app.get('/traerprod',(req,res)=>{
-    
-    productos.find(function(err, productos){
-        if(err) throw err;
-      //  console.log("Estos son los productos" + " " + productos);
-        res.write(JSON.stringify(productos));
-        return res.end();
-        
-   });
-});
 
 //------------------------------------------------------ Muestra el maximo de cada producto de una lista de materiales-------------------------
 //---------------------------------------------------------------------------------------------------------------------------------------------
@@ -759,6 +747,7 @@ app.get('/detallehisto_pen',(req,res)=>{
 });
 
 
+
 //----------------------------------------------------Usuarios-------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -869,4 +858,135 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
             res.end();
       }
 });
+
+//----------------------------------------------------Productos-----------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------Trae todos los productos para dar de alta una lista de materiales----------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/traerprod',(req,res)=>{
     
+    productos.find(function(err, productos){
+        if(err) throw err;
+      //  console.log("Estos son los productos" + " " + productos);
+        res.write(JSON.stringify(productos));
+        return res.end();
+        
+   });
+});
+
+//-------------------------------------------------Guarda el producto en la base de datos---------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
+app.get('/guardarprod',(req,res)=>{
+    var nummax = null;
+    var newlist = " ";
+
+    //console.log("llega al guardar" + " " + req.query.msj);
+
+    if(req.query.msj == "alta"){
+       //maximo producto
+        
+
+        var max = productos.find().sort({'PLN_INICIO': -1}).limit(1)
+            max.exec(function(err, maxResult){
+                if(err) throw err;
+                
+                else{
+                    // console.log("El maximo del plano es:" + " " + maxResult[0].PLN_INICIO);
+                    nummax = ((maxResult[0].PLN_INICIO.split('-')[1]));
+                    
+                    nummax = parseInt((maxResult[0].PLN_INICIO.split('-')[1])) + 1 ;
+        
+                    newlist = "LB9-0" + nummax;
+                    
+                }
+                
+           // });
+                var myobj = 
+                { PLN_FECHA: req.query.fecha,PLN_NOMBRE:req.query.nombre,PLN_DESCRIPCION:req.query.descripcion,PLN_INICIO:newlist};
+                
+                productos.create(myobj, function(err, resultadop) {
+                    if (err){
+                    
+                    var msjerror = "NO_OK_ALTA"
+                    }
+                    else{
+                    
+                        var msjerror = "OK"
+                        res.write(JSON.stringify(msjerror));
+                        return res.end();
+                    }    
+                });    
+            });
+
+    }
+
+    else
+    {
+       
+        productos.updateOne({_id:req.query.id},{$set:{PLN_FECHA:req.query.fecha,PLN_NOMBRE:req.query.nombre,PLN_DESCRIPCION:req.query.descripcion}}, function(err, result) {
+            if(err){
+                msjerror = "NO_OK_UPDATE"
+            }
+            else{
+               // console.log("este es el resultado" + result);
+                msjerror = "OK"
+                res.write(JSON.stringify(msjerror)); 
+                return res.end();   
+            }
+        });
+    }
+   
+
+
+   
+});
+
+//----------------------------------------------------------Eliminar producto de la base de datos-----------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+app.get('/eliminarprod',(req,res)=>{
+    console.log("este es el id del producto" + " " + req.query.row);
+
+    var myquery = { _id: req.query.row };
+
+    productos.deleteOne(myquery, function(err, obj) {
+        if(err){
+            msjerror = "NO_OK"
+        }
+        else{
+            msjerror = "OK"
+            res.write(JSON.stringify(msjerror)); 
+            return res.end();   
+        }
+   
+    });
+  
+});
+
+//-------------------------------------------------Valido que el nombre de la lista de materiales no se repita-----------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------- 
+
+app.get('/validarnomblm',(req,res)=>{
+
+    //  console.log("nombre de la celda" + " " + req.query.nombrecel);
+      productos.find({PLN_NOMBRE:req.query.nombrecel}, function(err, lista) {
+          console.log(lista);
+          if(lista == ""){
+              var msj = "OK"
+             
+          }
+          else{
+              var msj = "NO_OK"
+            
+          }
+          console.log("mensaje de error" + " " + msj);
+          res.write(JSON.stringify(msj));
+          return res.end();
+          
+      });        
+  
+  });
+  
