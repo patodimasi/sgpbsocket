@@ -1393,6 +1393,7 @@ function Info_doc(nombre_tabla,titulo){
     $('#dconsultas').show();
     $('#content').hide(); 
     $('#dpendientes').hide(); 
+    $('#altaprod').hide();
     $('#codigo').val("");
     $('#nrorev').val("");
     $('#descripcion').val("");       
