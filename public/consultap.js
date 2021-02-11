@@ -397,10 +397,7 @@ function Consulta_t(){
                 "data": null,
                 "className": "text-center",
                 'render': function (data, type, row) {
-                  
-                  //  return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "' onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
-                  // return "<button "+permisos_usu.nuevarev+" id='"+JSON.stringify(data)+ "//" + "todos" + "' onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
-                  return "<button onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
+                  return "<button  id='"+JSON.stringify(data)+ "//" + "uno" + "'   onclick='NuevaRev(this)' class='GetNuevaRev  fa fa-plus'/>"
                 }
             },
           
@@ -408,9 +405,8 @@ function Consulta_t(){
         ],
 
         "order": [[1, 'asc']],
-      
-        
     });   
+
     table.MakeCellsEditable({
         "onUpdate": myCallbackFunction,
         "inputCss":'my-input-class',
@@ -525,7 +521,6 @@ function Cerrar_detalle(){
 //--------------------------------------------------------------------------------------------------------------------------------------
 
 function NuevaRev(item){
-  
     infoubi = $(item).attr("id");
     separador = infoubi.split("//")
     infodp = JSON.parse((separador[0]));
@@ -534,7 +529,7 @@ function NuevaRev(item){
  
     //asigno valor si viene de uno o varios documentos
     $('#signin').val(sep2);
-    Cerrar_detalle();
+   // Cerrar_detalle();
        
     $('#myModal_nr').modal('show');
 
@@ -551,7 +546,6 @@ function NuevaRev(item){
     $("#comentarios_nr").val(" ");
 
     $("#nuevarev_new_nr").val((infodp.PLN_NRO_REV) + 1);
-    //console.log("esta es la nueva rev" + " " + $("#nuevarev_new_nr").val());
     $("#fechaalta_new_nr").val(fecha);
     $("#descripcion_new_nr").val(infodp.PLN_DESCRIPCION);
     
@@ -1394,6 +1388,7 @@ function Info_doc(nombre_tabla,titulo){
     $('#content').hide(); 
     $('#dpendientes').hide(); 
     $('#altaprod').hide();
+    $('#usuarios').hide(); 
     $('#codigo').val("");
     $('#nrorev').val("");
     $('#descripcion').val("");       
