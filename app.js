@@ -11,6 +11,7 @@ var instructivodeensayos = require("./models/instructivodeensayos");
 var instructivodeproducciones = require("./models/instructivodeproducciones");
 var subinstructivodeproducciones = require("./models/subinstructivodeproducciones");
 var productos = require("./models/productos");
+var permisos = require("./models/permisos");
 const fs = require('fs');
 var _ = require('lodash');
 var program = require('commander');
@@ -408,7 +409,7 @@ app.get('/maxdoc',(req,res)=>{
    
 });
 
-//----------------------------------------------------Trae los badges de todos los docuentos------------------------------------------------
+//----------------------------------------------------Trae los badges de todos los documentos------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 app.get('/maximobadge',(req,res)=>{
@@ -858,6 +859,191 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
             res.end();
       }
 });
+
+//--------------------------------------------------Alta usuario----------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/alta_usu',(req,res)=>{
+   
+    console.log(req.query.nombre,req.query.apellido,req.query.logon,req.query.estado_check);
+
+    var f = new Date();
+    
+    fecha = f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear();
+    console.log(fecha);
+    var maximo = usuarios.find().sort({'USR_CODIGO':-1}).limit(1); // for MAX
+    var codigo_usr;
+    
+    maximo.exec(function(err, maxResult){
+        if(err) throw err;
+        
+        else{
+          console.log("El maximo del usuario es:" + " " + maxResult[0].USR_CODIGO);
+          codigo_usr = parseInt(maxResult[0].USR_CODIGO) + 1;
+            
+          var myobjusuario = 
+          {
+              USR_CODIGO: codigo_usr,USR_NOMBRE: req.query.nombre,USR_APELLIDO: req.query.apellido,USR_LOGON: req.query.logon,
+              USR_PASS: req.query.logon, USR_ESTADO: 'AC',USR_FECHA_ALTA: fecha ,
+          };
+     
+         
+
+          usuarios.create(myobjusuario, function(err, resultadop) {
+            if(err) throw err;
+           // console.log(req.query.estado_check);
+           weekdays =  getFullName(req.query.estado_check,codigo_usr);
+         
+            var myobjpermiso = 
+            {
+                PER_CODIGO: codigo_usr, PER_INGJ: weekdays.PER_INGJ, PER_INGS: weekdays.PER_INGS, PER_CC: weekdays.PER_CC,
+                PER_P: weekdays.PER_P, PER_ADMIN: weekdays.PER_ADMIN,PER_ROOT: weekdays.PER_ROOT,
+            };
+
+            permisos.create(myobjpermiso, function (error, resultadousu){
+                if (err) throw err;
+                var mensaje = "OK";
+                res.write(JSON.stringify(mensaje));
+                return res.end();
+            });
+            
+          });    
+          
+        }
+       
+    });
+    
+});
+
+function getFullName(weekDay,codigo_usr) {
+    var weekdays = {
+        PER_INGJ : 'N',
+        PER_INGS : 'N',
+        PER_CC : 'N',
+        PER_P: 'N',
+        PER_ADMIN: 'N',
+        PER_ROOT: 'N'
+    }
+    
+    for( var prop in weekdays ) { 
+        if (prop == weekDay){   
+            weekdays[ prop ] = 'S';
+        }
+    }
+
+    return weekdays;
+}
+
+//----------------------------------------------------Baja de un usuario-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/baja_usu',(req,res)=>{
+    usuarios.updateOne({_id: req.query.infousu},{$set:{USR_ESTADO: 'BA'}},{new:true}, function(err, result) {
+            
+        if (err){
+            throw err;
+        }
+        else{
+            usuarios.find({_id: req.query.infousu}, function(err, result) {
+                res.write(JSON.stringify(result));
+                return res.end();
+            });
+                
+        }
+            
+           
+    });
+     
+});
+
+//---------------------------------------------------Muestra los permisos de un usuario-----------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+//muestra los permisos del usuario
+app.get('/mostrar_usu',(req,res)=>{
+    //console.log("Es el codigo" + " " + req.query.codigo);
+    permisos.find({PER_CODIGO: req.query.codigo},function(err, permiso) {
+       // console.log("Es el permiso" + " " + permiso);
+        res.write(JSON.stringify(permiso));
+        return res.end();
+    });
+    
+});
+
+//-------------------------------------------------Busca todos los usuarios-------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/buscarTodosu',(req,res)=>{
+   
+    usuarios.find(function(err, usuario){
+        if(err) throw err;
+    
+        res.write(JSON.stringify(usuario));
+        return res.end();
+        
+   });
+      
+});
+
+//-----------------------------------------------Busca un usuario en particular-----------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/buscarusu',(req,res)=>{
+    var  filtro = {}
+    
+    // console.log(req.body.nombre,req.body.apellido);
+    if((req.query.nombre == '') && (req.query.apellido == '')){
+        res.write(JSON.stringify([]));
+        return res.end();
+    }
+
+    else
+    {
+        if(req.query.nombre != '')
+        {
+            filtro.USR_NOMBRE = {'$regex': '.*' + req.query.nombre + '.*',$options : 'i'}
+        }
+        if(req.query.apellido != '')
+        {
+            filtro.USR_APELLIDO = {'$regex': '.*' + req.query.apellido + '.*',$options : 'i'}
+        }
+
+        usuarios.find(filtro,function(err,usuario){
+            if (err){
+                throw err;
+            }
+           
+            res.write(JSON.stringify(usuario));
+            return res.end();
+        })
+    
+    }
+  
+});
+
+//------------------------------------------------Guarda los permisos modificados----------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+app.get('/modpermiso_usu',(req,res)=>{
+    // console.log(req.query.logon);
+     //console.log(req.query.permisos[0]);
+    console.log("es el vector de permisos" + " " + req.query.permisos);
+    usuarios.find({USR_LOGON: req.query.logon},function(err, usuario) {
+         if(err) throw err;
+         permisos.updateOne({PER_CODIGO:usuario[0].USR_CODIGO},{$set:{PER_INGJ:req.query.permisos[0],PER_INGS:req.query.permisos[1],
+             PER_CC:req.query.permisos[2],PER_P:req.query.permisos[3],PER_ADMIN:req.query.permisos[4],PER_ROOT:req.query.permisos[5]}}, function(err, result) {
+ 
+             if (err){
+                 var msj = "ERROR"
+             }
+             else{
+                 var msj = "OK"
+             }
+ 
+             res.write(JSON.stringify(msj));
+             return res.end();
+ 
+        });
+ 
+    });
+     
+     
+});
+
 
 //----------------------------------------------------Productos-----------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
