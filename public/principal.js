@@ -35,9 +35,10 @@ $(document).ready(function(){
     $( ".page-wrapper" ).before(htmlModalAltaDoc);
     $( ".page-wrapper" ).before(htmlAltaListaMateriales);
     $( ".page-wrapper" ).before(htmlAltaInstEnsayo);
-
+    $( ".page-wrapper" ).before(htmlModificarPermiso);
+    $( ".page-wrapper" ).before(htmlAltaUsuario);
     //Aca tendria qie estar los badge de cada documento
-
+   
     Obtener_Badge();  
 
     //chequeo si existe el nombre del usuario
