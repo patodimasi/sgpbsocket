@@ -168,12 +168,17 @@
                             </div> 
                         </li>
                         <li>
-                            <a data-menu-item="altaprod"  onclick="Info_altaprod()" class="personal-menu-item profile altaprod" href="#">
-                                <i class="fa fa-laptop"></i>
+                            <a data-menu-item="altap"  onclick="Info_altaprod()" class="personal-menu-item profile altaprod" href="#">
+                                <i class="fa fa-users"></i>
                                 <span >Productos</span>
                             </a>
-                            
-                        </li>       
+                        </li>  
+                        <li>
+                            <a data-menu-item="dcusuarios"  onclick="Info_usu()" class="personal-menu-item profile dcusuarios" href="#">
+                                <i class="fa fa-laptop"></i>
+                                <span >Usuarios</span>
+                            </a>
+                        </li>      
                         <li class="header-menu">
                             <span>Extra</span>
                         </li>
@@ -321,6 +326,67 @@
                     <span style='float:right'><button id='but_add'  class='btn btn-danger'>Agregar producto</button></span>
                 </div>  
 
+                <!-- Usuarios -->
+                <div id="usuarios" >
+                    <div class='row'>
+                        <div class='form-group col-md-12'>
+                            <h2>Consulta Usuarios</h2>
+                        </div>
+                    </div>
+                    <div class='row'>
+                    </div>
+                    <hr>
+
+                    <form class='form'>
+                        <div class='row'>
+                            <div class='col-md-8'>
+                                <div class='row'>
+                                    <div class='col-md-12'>
+                                        <label for='codigo'><strong>Nombre</strong></label>
+                                        <input id='nombreusu' type='text' class='form-control' id='nombref' placeholder='' value='' required></input>
+                                    </div>
+                                </div>
+                                <div class='row'>
+                                    <div class='col-md-12'>
+                                        <label for='descripcion'><strong> Apellido</strong></label>
+                                        <input type='text' class='form-control' id='apellidousu' placeholder='' value='' required>
+                                    </div>
+                                </div>
+                            </div> 
+                            <div class='col-md-4'>
+                                <img style='margin-top:-170px' src='./images/logocolores3.png'>
+                            </div>
+                        </div>
+                    </form>
+                    <div>
+                        <button style='margin-top:20px' type='button' id=mybtnAltau onclick='Btnaltau()' class='btn btn-info btn-circle btn-xl' data-toggle='tooltip'  title='Alta Usuario'><i class='fa fa-plus'></i>
+                    </div>
+
+                    <div style='margin-top:20px'>
+                        <button id=bpbusuario onclick='Consultausu(nombreusu.value,apellidousu.value)' type='button' class='btn btn-primary btn-sm'>Buscar</button>
+                        <button id=bptusuario onclick='Bptusuario()' type='button' style='margin-left:5px' class='btn btn-secondary btn-sm'>Todos</button>    
+                    </div>
+
+                    <div style='margin-left: -15px;margin-top: 40px' class='container'>
+                        <table id='tusuarios' class='display'>
+                            <thead>
+                                <tr>
+                                    <th style='width: 250px'></th>
+                                    <th style='width: 250px'></th>
+                                    <th style='width: 250px'></th>
+                                    <th style='width: 250px'></th>  
+                                    <th style='width: 250px'></th> 
+                                    <th style='width: 250px'></th> 
+                                </tr>
+                            </thead>  
+                            <tbody>
+            
+                            </tbody>  
+                        </table>
+                    </div>
+
+                </div>    
+
                 <div id="content">
                          
                 </div>
@@ -348,6 +414,7 @@
     <script src="pendiente.js"></script>
     <script src="altaprod.js"></script>
     <script src="principal.js"></script>
+    <script src="usuarios.js"></script>
     <script type="text/javascript" languaje="javascript" src="./scripts/jquery.dataTables.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css"> 
     <script src="./scripts/dataTables.cellEdit.js"></script>
