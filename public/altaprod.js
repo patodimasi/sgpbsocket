@@ -51,5 +51,5 @@ function Info_altaprod(){
     $('#dpendientes').hide();
     $('#content').hide(); 
     $('#dconsultas').hide(); 
-  
+    $('#usuarios').hide(); 
 }   
