@@ -12,13 +12,23 @@ var instructivodeproducciones = require("./models/instructivodeproducciones");
 var subinstructivodeproducciones = require("./models/subinstructivodeproducciones");
 var productos = require("./models/productos");
 var permisos = require("./models/permisos");
+var ensayosfinales = require("./models/ensayosfinales");
 const fs = require('fs');
 var _ = require('lodash');
 var program = require('commander');
 
 var multer = require("multer");
-var sharp = require('sharp');
+//var sharp = require('sharp');
 var async = require('async');
+
+const Enum = require('enum');
+
+//const myEnum = new Enum([' ', 'APROBADO', 'DESAPROBADO'])
+const myEnum = new Enum(['APROBADO', 'DESAPROBADO'])
+
+const PDFDocument = require('pdfkit');
+
+
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb){
@@ -777,6 +787,7 @@ app.get('/login',(req,res)=>{
                 codigo : docs[0].USR_CODIGO,
                 foto: docs[0].USR_FOTO,
                 label: docs[0].USR_LABEL,
+                estado: docs[0].USR_ESTADO,
                 logon : docs[0].USR_LOGON
             }
             test= q.query.usr;
@@ -832,7 +843,7 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
         console.log("logon usuario" + " " +  global.logonusu);
         var group = (req.file.filename.split(".")[0]);
         console.log("Este es el archivo " + " " + req.file.filename)
-        sharp(req.file.path)
+       // sharp(req.file.path)
         
     
         .toFile('public/uploadas/' + group + "-resize.jpg", function (err) {
@@ -1176,3 +1187,101 @@ app.get('/validarnomblm',(req,res)=>{
   
   });
   
+  //----------------------------------------------------Registros-----------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------Consulta de un registro-----------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+app.get('/buscar_reg',(req,res)=>{
+   
+    var buscar_reg = mongoose.model(req.query.nombre_tabla_consulta);
+    var  filtro = {}
+
+    if((req.query.ensayo == '')&& (req.query.serie == '') && (req.query.producto == '') && (req.query.pedido == '') && (req.query.cliente == '')  && (myEnum.enums[req.query.estado].key == ''))
+    {
+        res.write(JSON.stringify([]));
+        return res.end();  
+    }
+    else
+    {
+        if(req.query.ensayo != '')
+        {
+            filtro.NENSAYO = {'$regex': '.*' + req.query.ensayo + '.*',$options : 'i'}       
+        }
+        if(req.query.serie != '')
+        {
+            filtro.NSERIE = parseInt(req.query.serie);
+        }
+        if(req.query.producto != '')
+        {
+            filtro.PRODUCTO = {'$regex': '.*' + req.query.producto + '.*',$options : 'i'}
+        }
+        if(req.query.pedido != '')
+        {
+            filtro.PEDIDO =  parseInt(req.query.pedido);
+        }  
+        if(req.query.cliente != '')
+        {
+            filtro.CLIENTE = {'$regex': '.*' + req.query.cliente + '.*',$options : 'i'}
+        } 
+        if(req.query.estado != '')
+        {
+            filtro.ESTADO = myEnum.enums[req.query.estado].key;
+        }
+         
+    }
+    buscar_reg.find(filtro,function(err,registro){
+        if (err){
+            throw err;
+        }
+       
+        res.write(JSON.stringify(registro));
+        return res.end();
+       //console.log(registro);
+    })
+   
+});
+
+app.get('/tildarreg',(req,res)=>{
+    ensayosfinales.find({NENSAYO:req.query.aux}, function(err, lista) {
+       // console.log(lista);
+       if(err){
+           throw err;
+       }
+        res.write(JSON.stringify(lista));
+        return res.end();
+     
+        
+    });        
+
+});
+
+app.get('/sendPDF', (req, res) => {
+
+  /*  console.log(req.query.jsonProtocolo[1]);
+
+    var doc = new PDFDocument;
+    const texto = req.query.jsonProtocolo[0].NENSAYO +  "," + req.query.jsonProtocolo[0].FECHA + "," + req.query.jsonProtocolo[0].PEDIDO + "," +
+                req.query.jsonProtocolo[0].NSERIE + "," + req.query.jsonProtocolo[0].ESTADO + "," + req.query.jsonProtocolo[0].PRODUCTO; 
+    doc.text(texto);
+    doc.pipe(res);
+    doc.end();
+   
+*/
+    console.log(req.query.jsonProtocolo);
+
+    var doc = new PDFDocument;
+    
+    for(i = 0; i < req.query.jsonProtocolo.length  ; i++){
+        doc.text(req.query.jsonProtocolo[i].NENSAYO +  ", " + req.query.jsonProtocolo[i].FECHA + ", " + req.query.jsonProtocolo[i].PEDIDO + ", " +
+        req.query.jsonProtocolo[i].NSERIE + ", " + req.query.jsonProtocolo[i].ESTADO + ", " + req.query.jsonProtocolo[i].PRODUCTO + ", " + 
+        req.query.jsonProtocolo[i].CLIENTE + ", " + req.query.jsonProtocolo[i].DESCRIPCION + ", "  + req.query.jsonProtocolo[i].UALTA + ", " + 
+        req.query.jsonProtocolo[i].EIME);
+    }
+    doc.info['Title'] = 'Protocolo de ensayo ' + req.query.jsonProtocolo[0].NENSAYO;
+    doc.pipe(res);
+    doc.end();
+ 
+});
