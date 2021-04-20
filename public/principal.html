@@ -13,15 +13,22 @@
         
 
         <link rel="stylesheet" href="./css/main.css">
-       
         <link rel="stylesheet" href="./css/sidebar-themes.css">
         <link rel="shortcut icon"  href="./images/1.ico" />
         
         <script src="documento.js"></script>
+       
+          <!-- bootstrap -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <!-- dataTable -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">         
         
        
     </head>
     <style>
+
+       
     td.details-control {
         background: url('./images/detailsblue-abrir.png') no-repeat center center;
         cursor: pointer;
@@ -70,7 +77,7 @@
         
                             </div>
                        </div>
-                       <div id='img_contain'><img id="imagenf"></div> 
+                       <div id='img_contain'><img id="imagenf" onerror="this.src='./images/user.jpg'" ></div> 
                        <div class="input-group"> 
                            <div class="custom-file">
                                <input type="file" id="file" class="imgInp custom-file-input" aria-describedby="inputGroupFileAddon01">
@@ -103,23 +110,35 @@
                             <div  class="sidebar-submenu">
                                 <ul>
                                     <li>
-                                        <a  data-menu-item="dconsultas" onclick="Info_doc(plano.nombre_tabla,plano.nombre)" class="personal-menu-item dconsultas" href="#">Planos</a>         
+                                        <a  data-menu-item="dconsultas" onclick="Info_doc(plano.nombre_tabla,plano.nombre)"  href="#">Planos</a>         
                                     </li>
                                     <li>
-                                        <a data-menu-item="dconsultas" onclick="Info_doc(manual.nombre_tabla,manual.nombre)" class="personal-menu-item dconsultasm" href="#">Manuales</a>
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(manual.nombre_tabla,manual.nombre)" href="#">Manuales</a>
                                     </li>
                                     <li>
-                                        <a data-menu-item="dconsultas" onclick="Info_doc(material.nombre_tabla,material.nombre)" class="personal-menu-item dconsultasm" href="#">Lista de Materiales</a>   
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(material.nombre_tabla,material.nombre)"  href="#">Lista de Materiales</a>   
                                     </li>
                                     <li>
-                                        <a data-menu-item="dconsultas" onclick="Info_doc(instructivo_ensayo.nombre_tabla,instructivo_ensayo.nombre)" class="personal-menu-item dconsultasm" href="#">Instructivos de Ensayo</a>   
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(instructivo_ensayo.nombre_tabla,instructivo_ensayo.nombre)"  href="#">Instructivos de Ensayo</a>   
                                     </li>
                                     <li>
-                                        <a data-menu-item="dconsultas" onclick="Info_doc(instructivo_produccion.nombre_tabla,instructivo_produccion.nombre)" class="personal-menu-item dconsultasm" href="#">Instructivos de Producción</a>    
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(instructivo_produccion.nombre_tabla,instructivo_produccion.nombre)"  href="#">Instructivos de Producción</a>    
                                     </li>
 
                                     <li>
-                                        <a data-menu-item="dconsultas" onclick="Info_doc(subinstructivo_produccion.nombre_tabla,subinstructivo_produccion.nombre)" class="personal-menu-item dconsultasm" href="#">Subinstructivos de Ensayo</a>  
+                                        <a data-menu-item="dconsultas" onclick="Info_doc(subinstructivo_produccion.nombre_tabla,subinstructivo_produccion.nombre)"  href="#">Subinstructivos de Ensayo</a>  
+                                    </li>
+                                 
+                                    <li>
+                                        <li>
+                                            <a href="#" class="dropdown-toggle"  data-toggle="dropdown" >Registros </a>
+                                            <ul class="dropdown-menu" style="background-color: #454545">
+                                                <li><a data-menu-item="dregistros" onclick="Info_reg(registro_final.nombre_tabla,registro_final.nombre)" href="#" >Ensayos Finales</a>
+                                                   
+                                                </li>
+                                            </ul>
+                                        </li>
+                                          
                                     </li>
                                 </ul>
                                 
@@ -297,7 +316,7 @@
                         </div>
                     </div>    	
                 </div>    
-                 <!-- Productos -->
+                <!-- Productos -->
                 <div id="altaprod" >
                     <div class='row'>
                         <div class='form-group col-md-12'>
@@ -387,6 +406,94 @@
 
                 </div>    
 
+                <!-- Registros -->
+
+                <div id="dregistros">
+                    <div class='row'>
+                        <div class='form-group col-md-12'>
+                            <h2 id="titulo_reg"></h2>
+                        </div>
+                    </div>
+                    <div class='row'>
+                    </div>
+                    <hr>
+                    <form class='form'>
+                        <div class='row'>
+                            <div class='col-md-10'>
+                                <div class='row'>
+                                    <div class='col-md-4'>
+                                        <label for='ensayo'><strong>N° Ensayo</strong></label>
+                                        <input  style='text-transform: uppercase' type='text' class='form-control' id='ensayo' placeholder='' value='' required></input>
+                                    </div>
+                                    <div class='col-md-4'>
+                                        <label  for='serie'><strong>N° Serie</strong></label>
+                                        <input  type='number' class='form-control' id='serie' placeholder='' value='' required></input>
+                                    </div>
+                                    <div class='col-md-4'>
+                                        <label  for='pedido'><strong>N° Pedido</strong></label>
+                                        <input  type='number' class='form-control' id='pedido' placeholder='' value='' required></input>
+                                    </div>
+
+                                </div>
+                                <div class='row'>
+                                    <div class='col-md-4'>
+                                        <label for='cliente'><strong> Cliente</strong></label>
+                                        <input type='text' class='form-control' id='cliente' placeholder='' value='' required>
+                                    </div>
+                                    <div class='col-md-4'>
+                                        <label for='producto'><strong> Producto</strong></label>
+                                        <input type='text' class='form-control' id='producto' placeholder='' value='' required>
+                                    </div>
+                                    <div class='col-md-4'>
+                                        <label for='estado'><strong> Estado</strong></label>
+                                        <select class='custom-select d-block w-100' id='estado' required>
+                                            <option value=0>Aprobado</option>
+                                            <option value=1>Desaprobado</option>  
+                                        </select>
+                                    </div>
+                                </div>
+                               
+                            </div>    
+                        </div>
+                    </form>    
+                    <button id=bpb_reg type="button"  onclick="Buscar_reg()"  style='margin-top:40px' class="btn btn-light"><b>Buscar</b></button>
+                    <button type="button" style='margin-top:40px;margin-left: 60px;' onclick="GenerarProtocolo()" class="btn btn-light"><b>Generar Protocolo</b></button>
+                    <div id="tableexample_reg" style='margin-left: -15px;margin-top: 50px' class='container'>
+                        <table id="example_reg" class="display" cellspacing="0" width="100%">
+                            <thead>
+                               <tr>
+                                    <th></th>        
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                               </tr>
+                            </thead>
+                            <tfoot>
+                               <tr>
+                                  <th></th>      
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                               </tr>
+                            </tfoot>
+                         </table>
+                    </div>   
+                </div>    
+
                 <div id="content">
                          
                 </div>
@@ -415,6 +522,7 @@
     <script src="altaprod.js"></script>
     <script src="principal.js"></script>
     <script src="usuarios.js"></script>
+    <script src="registrosensayos.js"></script>
     <script type="text/javascript" languaje="javascript" src="./scripts/jquery.dataTables.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css"> 
     <script src="./scripts/dataTables.cellEdit.js"></script>

@@ -24,11 +24,12 @@
                   console.log(res);
                   var jsoLogin = JSON.parse(res);
                   
-                  if (jsoLogin.result.match("ERROR")){
+                  if ((jsoLogin.result.match("ERROR")  || (jsoLogin.estado == "BA"))){
                       $("#err").show();
                       $("#txtUser").val("");
                       $("#txtPassword").val("");     
                   }
+                  
                   else
                   {
                      console.log(jsoLogin.logon);

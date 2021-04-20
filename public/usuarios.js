@@ -529,5 +529,6 @@ function Info_usu(){
     $('#dpendientes').hide();
     $('#content').hide(); 
     $('#dconsultas').hide(); 
+    $('#dregistros').hide(); 
   
 };   

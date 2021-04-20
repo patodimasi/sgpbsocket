@@ -5,6 +5,7 @@ var material = new Material("Lista de Materiales","materiales");
 var instructivo_ensayo = new InstructivoEnsayo("Instructivos de Ensayo","instructivodeensayos");
 var instructivo_produccion = new InstructivoProduccion("Instructivos de Producción","instructivodeproducciones");
 var subinstructivo_produccion = new SubinstructivoProduccion("Subinstructivos de Producción","subinstructivodeproducciones");
+var registro_final = new RegistroFinal("Ensayos Finales","ensayosfinales");
 
 
 function Obtener_Badge(){

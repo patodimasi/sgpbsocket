@@ -2,6 +2,7 @@ const socket = io()
 //-----------------------------------------------------------------Consulta un solo documento-------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function Consulta(){
+    
     var codigo = $("#codigo").val();
     var descripcion = $("#descripcion").val();
     var nrorev = $("#nrorev").val();
@@ -34,9 +35,9 @@ function Consulta(){
                         "defaultContent": ""
                     } ,
                     
-                    { "data": "PLN_CODIGO"},
+                    { title: "Código","className": "text-center","data": "PLN_CODIGO"},
                   
-                    { "data": "PLN_DESCRIPCION"},
+                    { title: "Descripción","className": "text-left","data": "PLN_DESCRIPCION"},
                     { 
                         "data": null,
                         "className": "text-center",
@@ -49,8 +50,11 @@ function Consulta(){
                   
                             
                 ],
-
+             
+                
+                
                 "order": [[1, 'asc']] ,
+              
 
             });
 
@@ -1205,7 +1209,7 @@ function htmlModalUbicacion (){
                             '<input type="text" id="ubicacion" size="60"/>'+
                         '</div>'+
                         '<div class="modal-footer">'+
-                            '<button type="button" id="Aceptarmodif" onclick="Aceptarmodif()"  class="btn btn-primary">Aceptar</button>'+
+                            '<button type="button" id="aceptarmodif" onclick="Aceptarmodifubicacion()"  class="btn btn-primary">Aceptar</button>'+
                             '<button type="button" id="Cerrar" class="btn btn-secondary"  data-dismiss="modal">Cerrar</button>'+
                         '</div>'+
                         '<div class="container">'+
@@ -1343,13 +1347,13 @@ function htmlModalNuevaRev(){
 //--------------------------------------------------Acepta la modificacion de la ubicacion--------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
 
-function Aceptarmodif(){
+function Aceptarmodifubicacion(){
     aceptar_ubip = window["ubiplano"];
     ubi_modifp = $('#ubicacion').val().trim();
 
     var nombre = $("#bpb").val();
     var nombre_tabla_acep_modif_ubi = nombre;
-    
+
     if(validar_ubicacion(ubi_modifp) == false){
         alert("La ubicacion del documento tiene que comenzar con //BOHERDISERVER")
         $('#ubicacion').val("")
@@ -1389,13 +1393,13 @@ function Info_doc(nombre_tabla,titulo){
     $('#dpendientes').hide(); 
     $('#altaprod').hide();
     $('#usuarios').hide(); 
+    $('#dregistros').hide(); 
     $('#codigo').val("");
     $('#nrorev').val("");
     $('#descripcion').val("");       
     $('#example').dataTable().fnDestroy();
+    $("#example th").html("");     
     $("#example > tbody").html("");
- //   console.log("este es el nombre del doc" + " " + titulo);
-  //  console.log("este es el nombre de la tabla" + " " + nombre_tabla);
     $('#titulo').text(titulo);
     $('#bpb').val(nombre_tabla);
     

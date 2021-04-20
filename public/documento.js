@@ -40,3 +40,9 @@ function SubinstructivoProduccion(nombre,nombre_tabla){
 }
 
 SubinstructivoProduccion.prototype = new Documento();
+
+RegistroFinal.prototype = new Documento();
+
+function RegistroFinal(nombre, nombre_tabla){
+    Documento.call(this, nombre,nombre_tabla);
+}

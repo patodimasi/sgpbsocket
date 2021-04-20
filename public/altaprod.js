@@ -52,4 +52,5 @@ function Info_altaprod(){
     $('#content').hide(); 
     $('#dconsultas').hide(); 
     $('#usuarios').hide(); 
+    $('#dregistros').hide(); 
 }   
